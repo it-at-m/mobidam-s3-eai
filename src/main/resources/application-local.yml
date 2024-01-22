@@ -6,7 +6,19 @@ camel:
     #    Sollte sich der Camel Main Thread nach dem Start wieder beenden, folgende Property aktivieren (http://camel.apache.org/spring-boot.html).
     main-run-controller: true
     tracing: false
+  component:
+    aws2-s3:
+      access-key: PDSUYGWJFRITKL3PYYFW
+      secret-key: 4+u49QiJfSpqbAOCDasOn/kFYQxxpwoIW6QEeTF/
+      configuration: ${aws2S3Configuration}
+
 
 info:
   application:
     version: @project.version@-local
+
+s3:
+#  access-key: PDSUYGWJFRITKL3PYYFW
+#  secret-access-key: 4+u49QiJfSpqbAOCDasOn/kFYQxxpwoIW6QEeTF/
+  url: s3k.muenchen.de
+#  bucket: int-parkraummanagementk-migration

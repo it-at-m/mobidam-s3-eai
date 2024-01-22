@@ -19,5 +19,12 @@ logging:
 camel:
   springboot:
     tracing: false
+  component:
+    minio:
+      access-key: NLTP3BS63FZY06SLYZSY
+      secret-key: 3CRxpCLgPWIKX2j5y0NtIIVp47HH9e13UChRRvNZ
+#      configuration: ${aws2S3Configuration}
+      endpoint: https://s3k.muenchen.de
+#      include-folders: true
 
 output : mock:output
