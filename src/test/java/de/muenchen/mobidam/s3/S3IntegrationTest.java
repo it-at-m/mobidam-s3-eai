@@ -4,65 +4,92 @@
  */
 package de.muenchen.mobidam.s3;
 
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
+
 import org.apache.camel.*;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.apache.camel.component.minio.MinioConstants;
-import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.component.aws2.s3.AWS2S3Constants;
+import org.apache.camel.component.aws2.s3.AWS2S3Operations;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.TestPropertySource;
+import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Collection;
 
 /**
  * Der Test dient der Demonstration wie mit einer beliebigen Testkonfiguration
  * (test/application.yml) die
  * gesamte EAI vom Start bis zum Shutdown mit einem Testaufruf getestet werden kann.
  */
+@Disabled
 @SpringBootTest
 @CamelSpringBootTest
 class S3IntegrationTest {
 
-    @Produce(MobidamRouteBuilder.DIRECT_BUCKET)
+    @Produce(MobidamRouteBuilder.COMMON_S3_OPERATIONS)
     private ProducerTemplate producer;
 
-    @EndpointInject("mock:output")
-    private MockEndpoint output;
+    @Value("${camel.component.aws2-s3.bucket}")
+    private String bucket;
 
     @Autowired
-    CamelContext camelContext;
-
-    @Autowired
-    MinioClient minioClient;
+    private CamelContext camelContext;
 
     @Test
-    void s3ListTest() throws InterruptedException {
+    void s3ListBucketObjectsTest() throws InterruptedException {
 
-        var minioRequestObjects = ListObjectsArgs.builder().bucket("int-mdasc-mdasdev").region("us-east-1").recursive(true);
-        var list = minioClient.listObjects(minioRequestObjects.build());
+        var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects).build();
+        exchange.getIn().setBody(s3RequestObjects);
+        var bucketResponse = producer.send(exchange);
+        var objects = bucketResponse.getIn().getBody(Collection.class);
 
-        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(MinioConstants.OBJECT_NAME, "Test_EXP_VESPA-STAMMSATZ_W01_20230525.csv").build();
-//        exchange.getIn().setHeader(MinioConstants.BUCKET_NAME, "int-parkraummanagementk-migration");
-//         exchange.getIn().setBody(new ListObjectsArgs());
-//
-//        exchange.getIn().setHeader(MinioConstants.BUCKET_NAME, "int-parkraummanagementk-migration");
+        Assertions.assertEquals(1, objects.size());
+        Assertions.assertEquals("Test.csv", ((S3Object)objects.stream().toList().get(0)).key());
 
-        https://chat.openai.com/c/5aa2602a-60e4-4e3c-8b52-0823ec8b8e68
-        
-        exchange.getIn().setBody(minioRequestObjects);
-        exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
+    }
 
-        var bucketListObjects = producer.send(exchange);
+    @Test
+    void s3PresignedObjectUrlTest() throws InterruptedException {
 
-        Assertions.assertNotNull(bucketListObjects);
+        var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects).build();
+        exchange.getIn().setBody(s3RequestObjects);
+        var bucketResponse = producer.send(exchange);
+        var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
 
+        Assertions.assertEquals(1, objectsCollection.size());
+        S3Object object = (S3Object) objectsCollection.iterator().next();
+
+        exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.KEY, object.key()).build();
+
+        bucketResponse = producer.send(MobidamRouteBuilder.CREATELINK_S3_OPERATION, exchange);
+
+        var linkCollection = bucketResponse.getIn().getBody(Collection.class);
+        Assertions.assertEquals(1, linkCollection.size());
+        var link = (String)linkCollection.iterator().next();
+        Assertions.assertTrue(link.contains("https://int-mdasc-mdasdev.s3k.muenchen.de/Test.csv"));
+
+
+    }
+
+    @Test
+    void s3ListBucketsTest() throws InterruptedException {
+
+        var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listBuckets).build();
+        exchange.getIn().setBody(s3RequestObjects);
+        var bucketResponse = producer.send(exchange);
+        var objects = bucketResponse.getIn().getBody(Collection.class);
+
+        Assertions.assertEquals(1, objects.size());
+        Assertions.assertEquals("int-mdasc-mdasdev", ((Bucket)objects.stream().toList().get(0)).name());
 
     }
 

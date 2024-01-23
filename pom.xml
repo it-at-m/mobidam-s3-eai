@@ -101,8 +101,8 @@
 
         <!-- S3 -->
         <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-minio-starter</artifactId>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-aws2-s3</artifactId>
         </dependency>
 
         <!-- Test -->
