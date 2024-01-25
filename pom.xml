@@ -65,7 +65,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-             <!-- Spring Boot BOM -->
+            <!-- Spring Boot BOM -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -103,6 +103,26 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-aws2-s3</artifactId>
+        </dependency>
+
+        <!-- REST https://camel.apache.org/components/4.0.x/rest-api-component.html -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-rest-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
         </dependency>
 
         <!-- Test -->
@@ -292,6 +312,35 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!--
+                https://openapi-generator.tech/docs/plugins
+                https://openapi-generator.tech/docs/generators/java-camel
+            -->
+            <!--
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>6.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/META-INF/openapi/s3eai_v1.yaml</inputSpec>
+                            <generatorName>java-camel</generatorName>
+                            <configOptions>
+                                <sourceFolder>src/gen/java/main</sourceFolder>
+                                <apiPackage>de.muenchen.mobidam.rest</apiPackage>
+                                <modelPackage>de.muenchen.mobidam.rest</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+
 
         </plugins>
     </build>

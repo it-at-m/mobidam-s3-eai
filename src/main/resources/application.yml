@@ -6,6 +6,13 @@ camel:
   servlet:
     mapping:
       context-path: /api/*
+  component:
+    aws2-s3:
+      access-key: ...
+      secret-key: ...
+      override-endpoint: ...
+      bucket: ...
+      region: ...
 
 spring:
   application:
@@ -38,6 +45,3 @@ logging:
   level:
     org:
       springframework: INFO
-
-#  https://camel.apache.org/components/next/index.html
-output: direct:foo
