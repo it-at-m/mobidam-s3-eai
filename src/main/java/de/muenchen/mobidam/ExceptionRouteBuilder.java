@@ -1,7 +1,9 @@
 package de.muenchen.mobidam;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ExceptionRouteBuilder extends RouteBuilder {
 
     public static final String DIRECT_EXCEPTION_HANDLING = "direct:exceptionHandling";

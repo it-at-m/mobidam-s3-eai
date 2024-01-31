@@ -27,10 +27,15 @@ public class S3RouteBuilder extends RouteBuilder {
 
         from(OPERATION_COMMON)
                 .routeId("S3-Operation-Common").routeDescription("Execute S3 Operation")
-                .log(LoggingLevel.DEBUG, ExceptionRouteBuilder.MOBIDAM_LOGGER, "Message received ... ")
+                .log(LoggingLevel.DEBUG, ExceptionRouteBuilder.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
-                .toD(String.format("aws2-s3://{{camel.component.aws2-s3.bucket}}?S3Client=#s3Client&operation=${header.%s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION))
-                .process("restResponseWrapper");
+                .choice()
+                    .when(simple("${exchangeProperty.CamelExceptionCaught} == null"))
+                        .toD(String.format("aws2-s3://{{camel.component.aws2-s3.bucket}}?S3Client=#s3Client&operation=${header.%s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION))
+                        .process("restResponseWrapper")
+                     .otherwise()
+                        .setBody(simple("${exchangeProperty.CamelExceptionCaught}"))
+                .endChoice();
 
         from(OPERATION_CREATE_LINK)
                 .routeId("S3-Operation-CreateLink").routeDescription("Execute S3 Create Link Operation")
