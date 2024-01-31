@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: S3-EAI API
+  version: v1
+servers:
+- url: https://localhost:8080
+components:
+  schemas:
+    OASError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: |
+                  For input validation errors, identifies where
+                  in the JSON request body the error occurred.
+              message:
+                type: string
+                description: Human-readable error message.
+              errorCode:
+                type: string
+                description: Code indicating error type.
+paths: 
+  /filesInFolder:
+    get:
+      description: Get S3 bucket object list
+      parameters:
+      - name: bucketName
+        description: Bucket name
+        in: query
+        schema:
+          type: string
+          example: MyBucketName
+        required: true
+      responses:
+        '200':
+          description: Bucket content
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    lastmodified:
+                      type: string
+                    size:
+                      type: number
+        '409':
+          description: More than allowed bucket objects available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OASError'
+                      
+                

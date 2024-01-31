@@ -6,8 +6,10 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 
+@Component
 public class S3OperationWrapper implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {

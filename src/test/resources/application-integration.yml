@@ -1,6 +1,3 @@
-# Sollte sich der Camel Main Thread nach dem Start wieder beenden, folgende Property aktivieren (http://camel.apache.org/spring-boot.html).
-# camel.springboot.main-run-controller=true
-
 # Spring-Boot Common-Application-Properties https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 
 management:
@@ -27,3 +24,7 @@ camel:
       bucket: ...
       region: ...
 
+mobidam:
+  limit:
+    search:
+      items: 20
