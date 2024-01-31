@@ -1,6 +1,6 @@
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.rest.FilesInFolderGet200ResponseInner;
+import de.muenchen.mobidam.rest.ViewBucketContent200ResponseInner;
 import org.apache.camel.Converter;
 import org.apache.camel.TypeConverters;
 import org.springframework.stereotype.Component;
@@ -14,19 +14,19 @@ import java.util.Collection;
 public class FilesInFolderConverter implements TypeConverters {
 
     @Converter
-   public FilesInFolderGet200ResponseInner[] convert(Collection<S3Object> objects){
+   public ViewBucketContent200ResponseInner[] convert(Collection<S3Object> objects){
 
-        var files = new ArrayList<FilesInFolderGet200ResponseInner>();
+        var files = new ArrayList<ViewBucketContent200ResponseInner>();
 
         objects.forEach(s3object -> {
-            var file = new FilesInFolderGet200ResponseInner();
+            var file = new ViewBucketContent200ResponseInner();
             file.setKey(s3object.key());
             file.setLastmodified(s3object.lastModified().toString());
             file.setSize(new BigDecimal(s3object.size()));
             files.add(file);
 
         });
-        return files.toArray(FilesInFolderGet200ResponseInner[]::new);
+        return files.toArray(ViewBucketContent200ResponseInner[]::new);
     }
 
 }

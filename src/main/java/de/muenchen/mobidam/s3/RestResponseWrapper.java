@@ -1,9 +1,9 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.MobidamException;
-import de.muenchen.mobidam.rest.FilesInFolderGet200ResponseInner;
 import de.muenchen.mobidam.rest.OASError;
 import de.muenchen.mobidam.rest.OASErrorErrorsInner;
+import de.muenchen.mobidam.rest.ViewBucketContent200ResponseInner;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.http.HttpStatus;
@@ -24,18 +24,28 @@ public class RestResponseWrapper implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
 
-
         try {
+            // Invalid ServletContextPath is handled by servlet container
             var contextPath = exchange.getIn().getHeader("CamelServletContextPath", String.class).replace("/", "");
             switch (contextPath) {
                 case "filesInFolder":
                     filesInFile(exchange);
                     break;
                 default:
+                    // No OASError because invalid ServletContextPath is handled by servlet container
                     exchange.setException(new MobidamException("REST ContextPath not found : " + contextPath));
             }
         } catch (Exception ex) {
-            exchange.setException(new MobidamException("RestResponseWrapper failed.", ex));
+
+            var wrapperErrorInner = new OASErrorErrorsInner();
+            wrapperErrorInner.setErrorCode(String.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
+            wrapperErrorInner.message(this.getClass().getSimpleName() + ": " + ex.getMessage());
+            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
+
+            var wrapperError = new OASError();
+            wrapperError.setMessage("Internal service error.");
+            wrapperError.addErrorsItem(wrapperErrorInner);
+            exchange.getOut().setBody(wrapperError);
         }
 
     }
@@ -58,10 +68,10 @@ public class RestResponseWrapper implements Processor {
             return;
         }
 
-        var files = new ArrayList<FilesInFolderGet200ResponseInner>();
+        var files = new ArrayList<ViewBucketContent200ResponseInner>();
 
         objects.forEach(s3object -> {
-            var file = new FilesInFolderGet200ResponseInner();
+            var file = new ViewBucketContent200ResponseInner();
             file.setKey(((S3Object)s3object).key());
             file.setLastmodified(((S3Object)s3object).lastModified().toString());
             file.setSize(new BigDecimal(((S3Object)s3object).size()));

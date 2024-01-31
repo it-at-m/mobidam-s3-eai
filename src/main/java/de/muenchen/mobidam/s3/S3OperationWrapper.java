@@ -24,7 +24,12 @@ public class S3OperationWrapper implements Processor {
 
                 switch (contextPath) {
                     case "filesInFolder":
-                        exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).build());
+                        var prefix = exchange.getIn().getHeader("path", String.class);
+                        if (prefix != null)
+                            exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());
+                        else
+                            exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).build());
+
                         exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
                         break;
                     default:

@@ -10,12 +10,12 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * FilesInFolderGet200ResponseInner
+ * ViewBucketContent200ResponseInner
  */
 
-@JsonTypeName("_filesInFolder_get_200_response_inner")
-@Generated(value = "org.openapitools.codegen.languages.JavaCamelServerCodegen", date = "2024-01-24T14:26:59.676107700+01:00[Europe/Berlin]")
-public class FilesInFolderGet200ResponseInner {
+@JsonTypeName("viewBucketContent_200_response_inner")
+@Generated(value = "org.openapitools.codegen.languages.JavaCamelServerCodegen", date = "2024-01-31T16:18:08.341771+01:00[Europe/Berlin]")
+public class ViewBucketContent200ResponseInner {
 
   private String key;
 
@@ -23,7 +23,7 @@ public class FilesInFolderGet200ResponseInner {
 
   private BigDecimal size;
 
-  public FilesInFolderGet200ResponseInner key(String key) {
+  public ViewBucketContent200ResponseInner key(String key) {
     this.key = key;
     return this;
   }
@@ -43,7 +43,7 @@ public class FilesInFolderGet200ResponseInner {
     this.key = key;
   }
 
-  public FilesInFolderGet200ResponseInner lastmodified(String lastmodified) {
+  public ViewBucketContent200ResponseInner lastmodified(String lastmodified) {
     this.lastmodified = lastmodified;
     return this;
   }
@@ -63,7 +63,7 @@ public class FilesInFolderGet200ResponseInner {
     this.lastmodified = lastmodified;
   }
 
-  public FilesInFolderGet200ResponseInner size(BigDecimal size) {
+  public ViewBucketContent200ResponseInner size(BigDecimal size) {
     this.size = size;
     return this;
   }
@@ -72,7 +72,7 @@ public class FilesInFolderGet200ResponseInner {
    * Get size
    * @return size
   */
-  @Valid
+  @Valid 
   @Schema(name = "size", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("size")
   public BigDecimal getSize() {
@@ -91,10 +91,10 @@ public class FilesInFolderGet200ResponseInner {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    FilesInFolderGet200ResponseInner filesInFolderGet200ResponseInner = (FilesInFolderGet200ResponseInner) o;
-    return Objects.equals(this.key, filesInFolderGet200ResponseInner.key) &&
-        Objects.equals(this.lastmodified, filesInFolderGet200ResponseInner.lastmodified) &&
-        Objects.equals(this.size, filesInFolderGet200ResponseInner.size);
+    ViewBucketContent200ResponseInner viewBucketContent200ResponseInner = (ViewBucketContent200ResponseInner) o;
+    return Objects.equals(this.key, viewBucketContent200ResponseInner.key) &&
+        Objects.equals(this.lastmodified, viewBucketContent200ResponseInner.lastmodified) &&
+        Objects.equals(this.size, viewBucketContent200ResponseInner.size);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class FilesInFolderGet200ResponseInner {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class FilesInFolderGet200ResponseInner {\n");
+    sb.append("class ViewBucketContent200ResponseInner {\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    lastmodified: ").append(toIndentedString(lastmodified)).append("\n");
     sb.append("    size: ").append(toIndentedString(size)).append("\n");

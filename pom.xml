@@ -327,7 +327,7 @@
 <!--                            <goal>generate</goal>-->
 <!--                        </goals>-->
 <!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/openapi_s3eai_v1.yaml</inputSpec>-->
+<!--                            <inputSpec>${project.basedir}/src/main/resources/openapi_rest_s3_v1.yaml</inputSpec>-->
 <!--                            <generatorName>java-camel</generatorName>-->
 <!--                            <configOptions>-->
 <!--                                <sourceFolder>src/gen/java/main</sourceFolder>-->

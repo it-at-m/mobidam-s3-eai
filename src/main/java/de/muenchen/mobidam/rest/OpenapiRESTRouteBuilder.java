@@ -25,17 +25,23 @@ public class OpenapiRESTRouteBuilder extends RouteBuilder {
         rest()
             .get("/filesInFolder")
                 .description("")
-                .id("filesInFolderGetApi")
+                .id("viewBucketContentApi")
                 .produces("application/json")
-                .outType(FilesInFolderGet200ResponseInner[].class)
+                .outType(ViewBucketContent200ResponseInner[].class)
                 .param()
                     .name("bucketName")
                     .type(RestParamType.query)
                     .required(true)
                     .description("Bucket name")
                 .endParam()
-//                .to(S3RouteBuilder.CONFIGURE_S3_OPERATION);
+                .param()
+                    .name("path")
+                    .type(RestParamType.query)
+                    .required(false)
+                    .description("S3 path")
+                .endParam()
+
                 .to(S3RouteBuilder.OPERATION_COMMON);
-        
+
     }
 }

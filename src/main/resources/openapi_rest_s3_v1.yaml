@@ -2,6 +2,9 @@ openapi: 3.0.3
 info:
   title: S3-EAI API
   version: v1
+tags:
+- name: Files
+  description: Files related operations
 servers:
 - url: https://localhost:8080
 components:
@@ -31,6 +34,9 @@ components:
 paths: 
   /filesInFolder:
     get:
+      tags:
+      - Files
+      operationId: viewBucketContent
       description: Get S3 bucket object list
       parameters:
       - name: bucketName
@@ -40,6 +46,13 @@ paths:
           type: string
           example: MyBucketName
         required: true
+      - name: path
+        description: S3 path
+        in: query
+        schema:
+          type: string
+          example: MyPathName
+        required: false  
       responses:
         '200':
           description: Bucket content
@@ -57,7 +70,7 @@ paths:
                     size:
                       type: number
         '409':
-          description: More than allowed bucket objects available
+          description: More than allowed bucket objects available 
           content:
             application/json:
               schema:
