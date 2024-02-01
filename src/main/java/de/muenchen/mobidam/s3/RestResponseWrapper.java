@@ -25,6 +25,12 @@ public class RestResponseWrapper implements Processor {
     public void process(Exchange exchange) throws Exception {
 
         try {
+
+            if (exchange.getIn().getBody() instanceof OASError) {
+                exchange.getOut().setBody(exchange.getIn().getBody());
+                return;
+            }
+
             // Invalid ServletContextPath is handled by servlet container
             var contextPath = exchange.getIn().getHeader("CamelServletContextPath", String.class).replace("/", "");
             switch (contextPath) {

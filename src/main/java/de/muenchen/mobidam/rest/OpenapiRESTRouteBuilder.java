@@ -17,7 +17,7 @@ public class OpenapiRESTRouteBuilder extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
-        errorHandler(deadLetterChannel(ExceptionRouteBuilder.DIRECT_EXCEPTION_HANDLING).useOriginalMessage());
+        errorHandler(deadLetterChannel(ExceptionRouteBuilder.EXCEPTION_HANDLING).useOriginalMessage());
 
         /**
         GET /filesInFolder
