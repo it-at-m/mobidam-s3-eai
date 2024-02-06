@@ -1,5 +1,6 @@
 package de.muenchen.mobidam.s3;
 
+import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.OASError;
 import de.muenchen.mobidam.rest.OASErrorErrorsInner;
 import org.apache.camel.Exchange;
@@ -27,7 +28,7 @@ public class S3ClientErrorWrapper implements Processor {
             var wrapperErrorInner = new OASErrorErrorsInner();
             wrapperErrorInner.setErrorCode(String.valueOf(exception.statusCode()));
             wrapperErrorInner.message(exception.getMessage());
-            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
+            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
 
             var wrapperError = new OASError();
             wrapperError.setMessage("S3 Client error.");

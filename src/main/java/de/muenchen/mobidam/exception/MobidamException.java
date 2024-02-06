@@ -1,4 +1,4 @@
-package de.muenchen.mobidam;
+package de.muenchen.mobidam.exception;
 
 public class MobidamException extends Exception {
 

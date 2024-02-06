@@ -1,6 +1,7 @@
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.MobidamException;
+import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.MobidamException;
 import de.muenchen.mobidam.rest.OASError;
 import de.muenchen.mobidam.rest.OASErrorErrorsInner;
 import de.muenchen.mobidam.rest.ViewBucketContent200ResponseInner;
@@ -32,7 +33,7 @@ public class RestResponseWrapper implements Processor {
             }
 
             // Invalid ServletContextPath is handled by servlet container
-            var contextPath = exchange.getIn().getHeader("CamelServletContextPath", String.class).replace("/", "");
+            var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
             switch (contextPath) {
                 case "filesInFolder":
                     filesInFile(exchange);
@@ -46,7 +47,7 @@ public class RestResponseWrapper implements Processor {
             var wrapperErrorInner = new OASErrorErrorsInner();
             wrapperErrorInner.setErrorCode(String.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
             wrapperErrorInner.message(this.getClass().getSimpleName() + ": " + ex.getMessage());
-            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
+            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
 
             var wrapperError = new OASError();
             wrapperError.setMessage("Internal service error.");
@@ -65,7 +66,7 @@ public class RestResponseWrapper implements Processor {
             var itemsExceedSwellInner = new OASErrorErrorsInner();
             itemsExceedSwellInner.setErrorCode(String.valueOf(HttpStatus.SC_CONFLICT));
             itemsExceedSwellInner.message(String.format("Do not supply more than %s objects per request", maxS3ObjectItems));
-            itemsExceedSwellInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
+            itemsExceedSwellInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
 
             var itemsExceedSwell = new OASError();
             itemsExceedSwell.setMessage(String.format("%s S3 Objects found in bucket. Number of available objects should not exceed %s items. Specify S3 search criteria, clean up bucket content or increase supply limit.", objects.size(), maxS3ObjectItems));

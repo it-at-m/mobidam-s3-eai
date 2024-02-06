@@ -37,10 +37,9 @@ import java.nio.file.Path;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
-@ActiveProfiles("limit")
 @EnableAutoConfiguration
 @DirtiesContext
-class S3FileLimitTest {
+class S3PrefixTest {
 
     @Produce("http:127.0.0.1:8081/filesInFolder")
     private ProducerTemplate producer;
@@ -92,7 +91,7 @@ class S3FileLimitTest {
         // Create test bucket
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_2.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/File_2.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
 
     }
 
@@ -102,7 +101,7 @@ class S3FileLimitTest {
     }
 
     @Test
-    public void exceedFileLimitTest() {
+    public void noPrefixTest() {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
@@ -110,15 +109,34 @@ class S3FileLimitTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertEquals("class OASError {\n" +
-                "    message: 2 S3 Objects found in bucket. Number of available objects should not exceed 1 items. Specify S3 search criteria, clean up bucket content or increase supply limit.\n" +
-                "    errors: [class OASErrorErrorsInner {\n" +
-                "        path: /filesInFolder?bucketName=test-bucket)\n" +
-                "        message: Do not supply more than 1 objects per request\n" +
-                "        errorCode: 409\n" +
-                "    }]\n" +
-                "}", json);
+        Assertions.assertTrue(json.contains("File_1.csv"));
+        Assertions.assertTrue(json.contains("File_2.csv"));
+    }
 
+    @Test
+    public void prefixTest() {
+
+        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
+                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?path=archive&bucketName=" + bucket)
+                .build();
+        var response = producer.send(openapiRequest);
+        var json = response.getOut().getBody(String.class);
+        Assertions.assertFalse(json.contains("File_1.csv"));
+        Assertions.assertTrue(json.contains("File_2.csv"));
+    }
+
+    @Test
+    public void prefixNoMatchTest() {
+
+        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
+                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?path=noMatch&bucketName=" + bucket)
+                .build();
+        var response = producer.send(openapiRequest);
+        var json = response.getOut().getBody(String.class);
+        Assertions.assertFalse(json.contains("File_1.csv"));
+        Assertions.assertFalse(json.contains("File_2.csv"));
     }
 
 }

@@ -1,6 +1,7 @@
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.MobidamException;
+import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.MobidamException;
 import de.muenchen.mobidam.rest.OASError;
 import de.muenchen.mobidam.rest.OASErrorErrorsInner;
 import org.apache.camel.Exchange;
@@ -13,18 +14,19 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 
 @Component
 public class S3OperationWrapper implements Processor {
+
     @Override
     public void process(Exchange exchange) throws Exception {
 
             // Invalid ServletContextPath is handled by servlet container
-            var contextPath = exchange.getIn().getHeader("CamelServletContextPath", String.class).replace("/", "");
+            var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
             var bucketName = isBucketName(exchange);
 
             if (bucketName != null) {
 
                 switch (contextPath) {
                     case "filesInFolder":
-                        var prefix = exchange.getIn().getHeader("path", String.class);
+                        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
                         if (prefix != null)
                             exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());
                         else
@@ -40,13 +42,13 @@ public class S3OperationWrapper implements Processor {
     }
 
     private String isBucketName(Exchange exchange) {
-     var bucketName = exchange.getIn().getHeader("bucketName", String.class);
+     var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
      if (bucketName == null || bucketName.trim().isEmpty()) {
 
          var bucketNameNotExistsInner = new OASErrorErrorsInner();
          bucketNameNotExistsInner.setErrorCode(String.valueOf(HttpStatus.SC_BAD_REQUEST));
          bucketNameNotExistsInner.message("Bucket name not exists.");
-         bucketNameNotExistsInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
+         bucketNameNotExistsInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
 
          var bucketNameNotExists = new OASError();
          bucketNameNotExists.setMessage("Bucket name is null or empty.");

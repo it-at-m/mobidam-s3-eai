@@ -6,10 +6,12 @@ package de.muenchen.mobidam.s3;
 
 
 import de.muenchen.mobidam.Application;
-import org.apache.camel.*;
+import de.muenchen.mobidam.Constants;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
-import org.apache.camel.component.aws2.s3.AWS2S3Operations;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -18,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -45,10 +45,10 @@ class S3IntegrationTest {
     private CamelContext camelContext;
 
     @Test
-    void s3BucketObjectsListTest() throws InterruptedException {
+    void s3BucketObjectsListTest() {
 
         var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
-        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader("CamelServletContextPath", "filesInFolder").withHeader("bucketName", bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder").withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send(exchange);
         var objects = bucketResponse.getIn().getBody(ArrayList.class);
@@ -57,10 +57,10 @@ class S3IntegrationTest {
     }
 
     @Test
-    void s3PresignedObjectUrlTest() throws InterruptedException {
+    void s3PresignedObjectUrlTest() {
 
         var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
-        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader("CamelServletContextPath", "filesInFolder").withHeader("bucketName", bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder").withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send(exchange);
         var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
