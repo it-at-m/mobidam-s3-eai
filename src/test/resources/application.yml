@@ -10,6 +10,9 @@ spring:
   profiles:
     active: default
 
+server:
+  port: 8081
+
 logging:
   level:
     org:
@@ -18,13 +21,16 @@ logging:
 camel:
   springboot:
     tracing: false
+  servlet:
+    mapping:
+      context-path: /api/*
   component:
     aws2-s3:
-      access-key: ...
-      secret-key: ...
-      override-endpoint: ...
-      bucket: ...
-      region: ...
+      access-key: foo
+      secret-key: foo
+      override-endpoint: http://127.0.0.1:8080
+      bucket: test-bucket
+      region: local
 
 mobidam:
   limit:

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
@@ -28,7 +29,7 @@ import java.util.Collection;
 @Disabled
 @CamelSpringBootTest
 @SpringBootTest(classes = { Application.class }, properties = {"camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," })
-@TestPropertySource(properties = { "spring.config.location = classpath:application-integration.yml" })
+@ActiveProfiles("integration")
 class S3IntegrationTest {
 
     @Produce(S3RouteBuilder.OPERATION_COMMON)

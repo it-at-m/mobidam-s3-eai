@@ -49,7 +49,7 @@ public class S3OperationWrapper implements Processor {
          bucketNameNotExistsInner.path(String.format("%s?%s)", exchange.getIn().getHeader("CamelServletContextPath", String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
 
          var bucketNameNotExists = new OASError();
-         bucketNameNotExists.setMessage("Bucket name not found.");
+         bucketNameNotExists.setMessage("Bucket name is null or empty.");
          bucketNameNotExists.addErrorsItem(bucketNameNotExistsInner);
          exchange.setProperty(Exchange.EXCEPTION_CAUGHT, bucketNameNotExists);
          return null;

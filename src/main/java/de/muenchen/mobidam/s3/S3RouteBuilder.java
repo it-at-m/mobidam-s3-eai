@@ -18,13 +18,10 @@ public class S3RouteBuilder extends RouteBuilder {
 
     public static final String OPERATION_COMMON = "direct:commonOperations";
     public static final String OPERATION_CREATE_LINK = "direct:createLink";
-
     public static final String S3Client = "direct:s3client";
 
     @Override
     public void configure() {
-
-        errorHandler(deadLetterChannel(ExceptionRouteBuilder.EXCEPTION_HANDLING).useOriginalMessage());
 
         from(OPERATION_COMMON)
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")

@@ -143,6 +143,24 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.robothy</groupId>
+            <artifactId>local-s3-rest</artifactId>
+            <version>1.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.robothy</groupId>
+            <artifactId>local-s3-jupiter</artifactId>
+            <version>1.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-http-starter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Sonstiges -->
         <dependency>
             <groupId>org.projectlombok</groupId>
