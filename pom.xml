@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -47,7 +48,45 @@
 
         <!-- Other -->
         <org.projectlombok.lombok.version>1.18.26</org.projectlombok.lombok.version>
+        <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
+
     </properties>
+
+    <profiles>
+        <profile>
+            <id>generate-openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>${openapi-generator-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <inputSpec>${project.basedir}/src/main/resources/openapi_rest_s3_v1.yaml</inputSpec>
+                                    <!--
+                                       https://openapi-generator.tech/docs/plugins
+                                       https://openapi-generator.tech/docs/generators/java-camel
+                                    -->
+                                    <generatorName>java-camel</generatorName>
+                                    <configOptions>
+                                        <sourceFolder>src/gen/java/main</sourceFolder>
+                                        <apiPackage>de.muenchen.mobidam.rest</apiPackage>
+                                        <modelPackage>de.muenchen.mobidam.rest</modelPackage>
+                                        <useSpringBoot3>true</useSpringBoot3>
+                                    </configOptions>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:http://git.muenchen.de/[YOUR PROJECT]</connection>
@@ -237,7 +276,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>${surefireArgLine}  -Dfile.encoding=${project.build.sourceEncoding}</argLine>
+                    <argLine>${surefireArgLine} -Dfile.encoding=${project.build.sourceEncoding}</argLine>
                 </configuration>
             </plugin>
 
@@ -331,32 +370,20 @@
                 </dependencies>
             </plugin>
 
-            <!--
-                https://openapi-generator.tech/docs/plugins
-                https://openapi-generator.tech/docs/generators/java-camel
-            -->
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                <version>6.6.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/openapi_rest_s3_v1.yaml</inputSpec>-->
-<!--                            <generatorName>java-camel</generatorName>-->
-<!--                            <configOptions>-->
-<!--                                <sourceFolder>src/gen/java/main</sourceFolder>-->
-<!--                                <apiPackage>de.muenchen.mobidam.rest</apiPackage>-->
-<!--                                <modelPackage>de.muenchen.mobidam.rest</modelPackage>-->
-<!--                                <useSpringBoot3>true</useSpringBoot3>-->
-<!--                            </configOptions>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>show-profiles</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
         </plugins>
     </build>
