@@ -36,7 +36,7 @@ paths:
     get:
       tags:
       - Files
-      operationId: viewBucketContent
+      operationId: filesInFolder
       description: Get S3 bucket object list
       parameters:
       - name: bucketName

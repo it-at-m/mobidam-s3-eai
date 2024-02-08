@@ -5,7 +5,7 @@
 */
 package de.muenchen.mobidam.rest;
 
-import de.muenchen.mobidam.ExceptionRouteBuilder;
+import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import de.muenchen.mobidam.s3.S3RouteBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestParamType;
@@ -25,7 +25,7 @@ public class OpenapiRESTRouteBuilder extends RouteBuilder {
         rest()
             .get("/filesInFolder")
                 .description("")
-                .id("viewBucketContentApi")
+                .id("filesInFolder")
                 .produces("application/json")
                 .outType(ViewBucketContent200ResponseInner[].class)
                 .param()
