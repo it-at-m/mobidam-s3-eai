@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -39,7 +38,7 @@ import java.nio.file.Path;
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
 @EnableAutoConfiguration
 @DirtiesContext
-class S3Test {
+class S3ObjectTest {
 
     @Produce("http:127.0.0.1:8081/filesInFolder")
     private ProducerTemplate producer;
@@ -66,7 +65,7 @@ class S3Test {
         localS3 = LocalS3.builder()
                 .port(8080)
                 .mode(LocalS3Mode.PERSISTENCE)
-                .dataPath("download")
+                .dataPath("src/test/resources/s3/")
                 .build();
 
         localS3.start();
@@ -98,10 +97,10 @@ class S3Test {
     }
 
     @Test
-    public void listObjectTest() {
+    public void test_RouteWithListObjectTest() {
 
         // Set S3 test-bucket content
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
@@ -118,46 +117,5 @@ class S3Test {
 
     }
 
-    @Test
-    public void bucketNameNotFoundTest()  {
-
-        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=foo")
-                .build();
-        var response = producer.send(openapiRequest);
-        var json = response.getOut().getBody(String.class);
-//        class OASError {
-//            message: S3 Client error.
-//                    errors: [class OASErrorErrorsInner {
-//                path: /filesInFolder?bucketName=foo)
-//                message: Bucket 'foo' not exist. (Service: S3, Status Code: 404, Request ID: 7153702453966274560)
-//                errorCode: 404
-//            }]
-//        }
-        Assertions.assertTrue(json.contains("Bucket 'foo' not exist"));
-    }
-
-    @Test
-    public void bucketNameNullOrEmptyTest()  {
-
-        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=")
-                .build();
-        var response = producer.send(openapiRequest);
-        var json = response.getOut().getBody(String.class);
-//        class OASError {
-//            message: Bucket name is null or empty.
-//            errors: [class OASErrorErrorsInner {
-//                path: /filesInFolder?bucketName=)
-//                message: Bucket name not exists.
-//                errorCode: 400
-//            }]
-//        }
-        Assertions.assertTrue(json.contains("Bucket name not exists."));
-
-
-    }
 
 }

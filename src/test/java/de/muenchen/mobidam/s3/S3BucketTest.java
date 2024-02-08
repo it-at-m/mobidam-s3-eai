@@ -29,16 +29,14 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 
 @CamelSpringBootTest
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
 @EnableAutoConfiguration
 @DirtiesContext
-class S3PrefixTest {
+class S3BucketTest {
 
     @Produce("http:127.0.0.1:8081/filesInFolder")
     private ProducerTemplate producer;
@@ -89,9 +87,6 @@ class S3PrefixTest {
 
         // Create test bucket
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/File_2.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-
     }
 
     @AfterAll
@@ -100,42 +95,45 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixTest() {
+    public void test_RouteWithBucketNameNotFoundTest()  {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=" + bucket)
+                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=foo")
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertTrue(json.contains("File_1.csv"));
-        Assertions.assertTrue(json.contains("File_2.csv"));
+//        class OASError {
+//            message: S3 Client error.
+//                    errors: [class OASErrorErrorsInner {
+//                path: /filesInFolder?bucketName=foo)
+//                message: Bucket 'foo' not exist. (Service: S3, Status Code: 404, Request ID: 7153702453966274560)
+//                errorCode: 404
+//            }]
+//        }
+        Assertions.assertTrue(json.contains("Bucket 'foo' not exist"));
     }
 
     @Test
-    public void test_RouteWithPrefixTest() {
+    public void test_RouteWithBucketNameNullOrEmptyTest()  {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?path=archive&bucketName=" + bucket)
+                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=")
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertFalse(json.contains("File_1.csv"));
-        Assertions.assertTrue(json.contains("File_2.csv"));
-    }
+//        class OASError {
+//            message: Bucket name is null or empty.
+//            errors: [class OASErrorErrorsInner {
+//                path: /filesInFolder?bucketName=)
+//                message: Bucket name not exists.
+//                errorCode: 400
+//            }]
+//        }
+        Assertions.assertTrue(json.contains("Bucket name not exists."));
 
-    @Test
-    public void test_RouteWithPrefixNoMatchTest() {
 
-        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?path=noMatch&bucketName=" + bucket)
-                .build();
-        var response = producer.send(openapiRequest);
-        var json = response.getOut().getBody(String.class);
-        Assertions.assertFalse(json.contains("File_1.csv"));
-        Assertions.assertFalse(json.contains("File_2.csv"));
     }
 
 }

@@ -67,7 +67,7 @@ class S3FileLimitTest {
         localS3 = LocalS3.builder()
                 .port(8080)
                 .mode(LocalS3Mode.PERSISTENCE)
-                .dataPath("download")
+                .dataPath("src/test/resources/s3/")
                 .build();
 
         localS3.start();
@@ -91,8 +91,8 @@ class S3FileLimitTest {
 
         // Create test bucket
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_2.csv").build(), Path.of(new File("s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_2.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
     }
 
@@ -102,7 +102,7 @@ class S3FileLimitTest {
     }
 
     @Test
-    public void exceedFileLimitTest() {
+    public void test_RouteWithExceedFileLimitTest() {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
