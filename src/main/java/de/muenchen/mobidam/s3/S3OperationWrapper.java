@@ -25,7 +25,7 @@ public class S3OperationWrapper implements Processor {
             if (bucketName != null) {
 
                 switch (contextPath) {
-                    case "filesInFolder":
+                    case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
                         var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
                         if (prefix != null)
                             exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());

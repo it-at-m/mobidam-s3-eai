@@ -4,7 +4,8 @@
  */
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.ExceptionRouteBuilder;
+import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -25,7 +26,7 @@ public class S3RouteBuilder extends RouteBuilder {
 
         from(OPERATION_COMMON)
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
-                .log(LoggingLevel.DEBUG, ExceptionRouteBuilder.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
+                .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
                 .choice()
                     .when(simple("${exchangeProperty.CamelExceptionCaught} == null"))
