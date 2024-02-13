@@ -12,7 +12,7 @@ import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OpenapiRESTRouteBuilder extends RouteBuilder {
+public class S3RESTRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
@@ -25,9 +25,8 @@ public class OpenapiRESTRouteBuilder extends RouteBuilder {
         rest()
             .get("/filesInFolder")
                 .description("")
-                .id("filesInFolder")
                 .produces("application/json")
-                .outType(ViewBucketContent200ResponseInner[].class)
+                .outType(BucketContent[].class)
                 .param()
                     .name("bucketName")
                     .type(RestParamType.query)
@@ -40,7 +39,6 @@ public class OpenapiRESTRouteBuilder extends RouteBuilder {
                     .required(false)
                     .description("S3 path")
                 .endParam()
-
                 .to(S3RouteBuilder.OPERATION_COMMON);
 
     }

@@ -35,7 +35,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 @CamelSpringBootTest
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
+@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
 @EnableAutoConfiguration
 @DirtiesContext
 class S3ObjectTest {
@@ -108,12 +108,7 @@ class S3ObjectTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        // [class FilesInFolderGet200ResponseInner {
-        //    key: File_1.csv
-        //    lastmodified: ...
-        //    size: 15
-        //}]
-        Assertions.assertTrue(json.contains("File_1.csv"));
+        Assertions.assertTrue(json.contains("<200 OK OK,[BucketContent(key=File_1.csv," ));
 
     }
 

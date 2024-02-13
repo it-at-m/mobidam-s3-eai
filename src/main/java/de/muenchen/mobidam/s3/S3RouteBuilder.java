@@ -5,7 +5,6 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -28,14 +27,8 @@ public class S3RouteBuilder extends RouteBuilder {
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
-                .choice()
-                    .when(simple("${exchangeProperty.CamelExceptionCaught} == null"))
-                        .process("s3ClientErrorWrapper")
-                        .process("restResponseWrapper")
-                     .otherwise()
-                        .setBody(simple("${exchangeProperty.CamelExceptionCaught}"))
-                        .to(ExceptionRouteBuilder.EXCEPTION_HANDLING)
-                .endChoice();
+                .process("s3ClientErrorWrapper")
+                .process("restResponseWrapper");
 
         from(S3Client).routeId("S3-Request").routeDescription("Execute S3 Operation")
              .toD(String.format("aws2-s3://{{camel.component.aws2-s3.bucket}}?S3Client=#s3Client&operation=${header.%s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION));

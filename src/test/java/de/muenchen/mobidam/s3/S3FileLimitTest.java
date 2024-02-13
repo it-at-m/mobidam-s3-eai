@@ -36,7 +36,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 @CamelSpringBootTest
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
+@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
 @ActiveProfiles("limit")
 @EnableAutoConfiguration
 @DirtiesContext
@@ -110,14 +110,7 @@ class S3FileLimitTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertEquals("class OASError {\n" +
-                "    message: 2 S3 Objects found in bucket. Number of available objects should not exceed 1 items. Specify S3 search criteria, clean up bucket content or increase supply limit.\n" +
-                "    errors: [class OASErrorErrorsInner {\n" +
-                "        path: /filesInFolder?bucketName=test-bucket)\n" +
-                "        message: Do not supply more than 1 objects per request\n" +
-                "        errorCode: 409\n" +
-                "    }]\n" +
-                "}", json);
+        Assertions.assertEquals("<400 BAD_REQUEST Bad Request,Request supply limit 1 is exceeded.,[]>", json);
 
     }
 

@@ -33,7 +33,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @CamelSpringBootTest
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/OpenapiRESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
+@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
 @EnableAutoConfiguration
 @DirtiesContext
 class S3BucketTest {
@@ -103,15 +103,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-//        class OASError {
-//            message: S3 Client error.
-//                    errors: [class OASErrorErrorsInner {
-//                path: /filesInFolder?bucketName=foo)
-//                message: Bucket 'foo' not exist. (Service: S3, Status Code: 404, Request ID: 7153702453966274560)
-//                errorCode: 404
-//            }]
-//        }
-        Assertions.assertTrue(json.contains("Bucket 'foo' not exist"));
+        Assertions.assertTrue(json.contains("<404 NOT_FOUND Not Found,Bucket 'foo' not exist. (Service: S3, Status Code: 404"));
     }
 
     @Test
@@ -123,15 +115,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-//        class OASError {
-//            message: Bucket name is null or empty.
-//            errors: [class OASErrorErrorsInner {
-//                path: /filesInFolder?bucketName=)
-//                message: Bucket name not exists.
-//                errorCode: 400
-//            }]
-//        }
-        Assertions.assertTrue(json.contains("Bucket name not exists."));
+        Assertions.assertTrue(json.contains("<400 BAD_REQUEST Bad Request,Bucket cannot be empty"));
 
 
     }

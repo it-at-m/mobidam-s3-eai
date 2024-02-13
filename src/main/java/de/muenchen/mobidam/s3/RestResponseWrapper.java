@@ -1,14 +1,12 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.exception.MobidamException;
-import de.muenchen.mobidam.rest.OASError;
-import de.muenchen.mobidam.rest.OASErrorErrorsInner;
-import de.muenchen.mobidam.rest.ViewBucketContent200ResponseInner;
+import de.muenchen.mobidam.rest.BucketContent;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -27,32 +25,21 @@ public class RestResponseWrapper implements Processor {
 
         try {
 
-            if (exchange.getIn().getBody() instanceof OASError) {
-                exchange.getOut().setBody(exchange.getIn().getBody());
+            if (exchange.getIn().getBody() instanceof ResponseEntity<?>) {
                 return;
             }
 
-            // Invalid ServletContextPath is handled by servlet container
             var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
             switch (contextPath) {
                 case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
                     filesInFile(exchange);
                     break;
                 default:
-                    // No OASError because invalid ServletContextPath is handled by servlet container
-                    exchange.setException(new MobidamException("REST ContextPath not found : " + contextPath));
+                    exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
             }
-        } catch (Exception ex) {
-
-            var wrapperErrorInner = new OASErrorErrorsInner();
-            wrapperErrorInner.setErrorCode(String.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-            wrapperErrorInner.message(this.getClass().getSimpleName() + ": " + ex.getMessage());
-            wrapperErrorInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
-
-            var wrapperError = new OASError();
-            wrapperError.setMessage("Internal service error.");
-            wrapperError.addErrorsItem(wrapperErrorInner);
-            exchange.getOut().setBody(wrapperError);
+        } catch (Exception exception) {
+            exchange.getOut().setBody(new ResponseEntity<>(exception.getLocalizedMessage(), HttpStatusCode.valueOf(500)));
+            exchange.setException(null);
         }
 
     }
@@ -62,30 +49,24 @@ public class RestResponseWrapper implements Processor {
         var objects = exchange.getIn().getBody(Collection.class);
 
         if (objects.size() > maxS3ObjectItems){
-
-            var itemsExceedSwellInner = new OASErrorErrorsInner();
-            itemsExceedSwellInner.setErrorCode(String.valueOf(HttpStatus.SC_CONFLICT));
-            itemsExceedSwellInner.message(String.format("Do not supply more than %s objects per request", maxS3ObjectItems));
-            itemsExceedSwellInner.path(String.format("%s?%s)", exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class), exchange.getIn().getHeader("CamelHttpQuery", String.class)));
-
-            var itemsExceedSwell = new OASError();
-            itemsExceedSwell.setMessage(String.format("%s S3 Objects found in bucket. Number of available objects should not exceed %s items. Specify S3 search criteria, clean up bucket content or increase supply limit.", objects.size(), maxS3ObjectItems));
-            itemsExceedSwell.addErrorsItem(itemsExceedSwellInner);
-            exchange.getOut().setBody(itemsExceedSwell);
+            var responseException = new ResponseEntity<>(String.format("Request supply limit %s is exceeded.", maxS3ObjectItems), HttpStatusCode.valueOf(400));
+            exchange.getOut().setBody(responseException);
+            exchange.setException(null);
             return;
         }
 
-        var files = new ArrayList<ViewBucketContent200ResponseInner>();
+        var files = new ArrayList<BucketContent>();
 
         objects.forEach(s3object -> {
-            var file = new ViewBucketContent200ResponseInner();
+            var file = new BucketContent();
             file.setKey(((S3Object)s3object).key());
             file.setLastmodified(((S3Object)s3object).lastModified().toString());
             file.setSize(new BigDecimal(((S3Object)s3object).size()));
             files.add(file);
 
         });
-        exchange.getOut().setBody(files);
+        var response = new ResponseEntity<>(files, HttpStatusCode.valueOf(200));
+        exchange.getOut().setBody(response);
     }
 
 

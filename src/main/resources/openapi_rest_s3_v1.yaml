@@ -9,34 +9,22 @@ servers:
 - url: https://localhost:8080
 components:
   schemas:
-    OASError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Human-readable error message
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              path:
-                type: string
-                description: |
-                  For input validation errors, identifies where
-                  in the JSON request body the error occurred.
-              message:
-                type: string
-                description: Human-readable error message.
-              errorCode:
-                type: string
-                description: Code indicating error type.
+    BucketContent:
+      type: array
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          lastmodified:
+            type: string
+          size:
+            type: number
 paths: 
   /filesInFolder:
     get:
       tags:
       - Files
-      operationId: filesInFolder
       description: Get S3 bucket object list
       parameters:
       - name: bucketName
@@ -59,21 +47,4 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    key:
-                      type: string
-                    lastmodified:
-                      type: string
-                    size:
-                      type: number
-        '409':
-          description: More than allowed bucket objects available 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OASError'
-                      
-                
+                  $ref: '#/components/schemas/BucketContent'
