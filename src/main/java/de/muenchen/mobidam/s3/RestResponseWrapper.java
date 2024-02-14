@@ -30,11 +30,11 @@ public class RestResponseWrapper implements Processor {
 
             var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
             switch (contextPath) {
-                case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
-                    filesInFile(exchange);
-                    break;
-                default:
-                    exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
+            case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
+                filesInFile(exchange);
+                break;
+            default:
+                exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
             }
         } catch (Exception exception) {
             exchange.getOut().setBody(new ResponseEntity<>(exception.getLocalizedMessage(), HttpStatusCode.valueOf(500)));
