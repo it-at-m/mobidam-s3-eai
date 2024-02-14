@@ -1,8 +1,10 @@
 package de.muenchen.mobidam.rest;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.math.BigDecimal;
 
 import jakarta.validation.Valid;
