@@ -35,7 +35,7 @@ import java.net.URISyntaxException;
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+        properties = { "camel.springboot.java-routes-include-pattern=**/RestRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
 @EnableAutoConfiguration
 @DirtiesContext

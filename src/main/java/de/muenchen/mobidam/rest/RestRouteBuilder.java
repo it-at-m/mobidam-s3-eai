@@ -12,7 +12,7 @@ import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class S3RESTRouteBuilder extends RouteBuilder {
+public class RestRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {

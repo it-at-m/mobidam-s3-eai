@@ -2,6 +2,9 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.BucketContent;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,10 +12,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Object;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Component
 public class RestResponseWrapper implements Processor {

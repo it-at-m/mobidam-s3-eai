@@ -6,8 +6,8 @@
 package de.muenchen.mobidam.rest;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.stereotype.Component;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.springframework.stereotype.Component;
 
 @Component
 public class RestConfiguration extends RouteBuilder {
