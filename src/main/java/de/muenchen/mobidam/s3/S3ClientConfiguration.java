@@ -11,7 +11,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
 @Configuration
 public class S3ClientConfiguration {
 
@@ -27,9 +26,10 @@ public class S3ClientConfiguration {
     @Value("${camel.component.aws2-s3.region}")
     private Region s3Region;
 
-     @Bean
+    @Bean
     public S3Client s3Client() throws URISyntaxException {
-        return  S3Client.builder().endpointOverride(new URI(s3url)).region(s3Region).credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(s3AccessKey, s3SecretAccessKey))).build();
+        return S3Client.builder().endpointOverride(new URI(s3url)).region(s3Region)
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(s3AccessKey, s3SecretAccessKey))).build();
     }
 
 }

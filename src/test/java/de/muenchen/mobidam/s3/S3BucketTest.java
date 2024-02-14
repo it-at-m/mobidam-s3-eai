@@ -33,7 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @CamelSpringBootTest
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
+@SpringBootTest(
+        classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+        properties = { "camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+)
 @EnableAutoConfiguration
 @DirtiesContext
 class S3BucketTest {
@@ -68,7 +71,8 @@ class S3BucketTest {
 
         localS3.start();
 
-        s3InitClient = S3Client.builder().endpointOverride(new URI("http://127.0.0.1:8080")).region(Region.of("local")).credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("foo", "foo"))).build();
+        s3InitClient = S3Client.builder().endpointOverride(new URI("http://127.0.0.1:8080")).region(Region.of("local"))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("foo", "foo"))).build();
 
         // Remove old test content
         var bucketsInTest = s3InitClient.listBuckets();
@@ -95,7 +99,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNotFoundTest()  {
+    public void test_RouteWithBucketNameNotFoundTest() {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
@@ -107,7 +111,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNullOrEmptyTest()  {
+    public void test_RouteWithBucketNameNullOrEmptyTest() {
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
@@ -116,7 +120,6 @@ class S3BucketTest {
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
         Assertions.assertTrue(json.contains("<400 BAD_REQUEST Bad Request,Bucket cannot be empty"));
-
 
     }
 

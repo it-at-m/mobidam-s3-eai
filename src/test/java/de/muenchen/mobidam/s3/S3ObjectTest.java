@@ -35,7 +35,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 @CamelSpringBootTest
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder,"})
+@SpringBootTest(
+        classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+        properties = { "camel.springboot.java-routes-include-pattern=**/S3RESTRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+)
 @EnableAutoConfiguration
 @DirtiesContext
 class S3ObjectTest {
@@ -70,7 +73,8 @@ class S3ObjectTest {
 
         localS3.start();
 
-        s3InitClient = S3Client.builder().endpointOverride(new URI("http://127.0.0.1:8080")).region(Region.of("local")).credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("foo", "foo"))).build();
+        s3InitClient = S3Client.builder().endpointOverride(new URI("http://127.0.0.1:8080")).region(Region.of("local"))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("foo", "foo"))).build();
 
         // Remove old test content
         var bucketsInTest = s3InitClient.listBuckets();
@@ -100,7 +104,8 @@ class S3ObjectTest {
     public void test_RouteWithListObjectTest() {
 
         // Set S3 test-bucket content
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(), Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var openapiRequest = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
@@ -108,9 +113,8 @@ class S3ObjectTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertTrue(json.contains("<200 OK OK,[BucketContent(key=File_1.csv," ));
+        Assertions.assertTrue(json.contains("<200 OK OK,[BucketContent(key=File_1.csv,"));
 
     }
-
 
 }

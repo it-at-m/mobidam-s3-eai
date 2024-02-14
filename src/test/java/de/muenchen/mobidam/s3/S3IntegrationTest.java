@@ -4,7 +4,6 @@
  */
 package de.muenchen.mobidam.s3;
 
-
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import org.apache.camel.CamelContext;
@@ -28,7 +27,7 @@ import java.util.Collection;
 
 @Disabled
 @CamelSpringBootTest
-@SpringBootTest(classes = { Application.class }, properties = {"camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," })
+@SpringBootTest(classes = { Application.class }, properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," })
 @ActiveProfiles("integration")
 class S3IntegrationTest {
 
@@ -48,11 +47,12 @@ class S3IntegrationTest {
     void s3BucketObjectsListTest() {
 
         var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
-        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder").withHeader("bucketName", bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
+                .withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send(exchange);
         var objects = bucketResponse.getIn().getBody(ArrayList.class);
-        Assertions.assertEquals("Test.csv", ((S3Object)objects.stream().toList().get(0)).key());
+        Assertions.assertEquals("Test.csv", ((S3Object) objects.stream().toList().get(0)).key());
 
     }
 
@@ -60,7 +60,8 @@ class S3IntegrationTest {
     void s3PresignedObjectUrlTest() {
 
         var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
-        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder").withHeader("bucketName", bucket).build();
+        var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
+                .withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send(exchange);
         var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
@@ -73,12 +74,10 @@ class S3IntegrationTest {
 
         var linkCollection = bucketResponse.getIn().getBody(Collection.class);
 
-        var link = (String)linkCollection.iterator().next();
+        var link = (String) linkCollection.iterator().next();
         var compare = String.format("https://%s.%s/Test.csv", bucket, s3url.substring(s3url.indexOf("//") + 2));
         Assertions.assertTrue(link.contains(compare), "Url not found: " + compare);
 
-
     }
-
 
 }

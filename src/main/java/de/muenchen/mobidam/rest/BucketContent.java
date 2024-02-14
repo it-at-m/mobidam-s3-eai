@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-
 import jakarta.annotation.Generated;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,4 +29,3 @@ public class BucketContent {
     private BigDecimal size;
 
 }
-

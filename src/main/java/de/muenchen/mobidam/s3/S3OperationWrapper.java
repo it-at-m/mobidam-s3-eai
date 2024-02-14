@@ -20,17 +20,17 @@ public class S3OperationWrapper implements Processor {
         var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
 
         switch (contextPath) {
-            case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
-                var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
-                if (prefix != null)
-                    exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());
-                else
-                    exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).build());
+        case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
+            var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
+            if (prefix != null)
+                exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());
+            else
+                exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).build());
 
-                exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
-                break;
-            default:
-                exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
+            exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
+            break;
+        default:
+            exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
 
         }
     }

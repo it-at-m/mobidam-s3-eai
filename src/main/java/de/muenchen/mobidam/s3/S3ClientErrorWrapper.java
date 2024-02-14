@@ -22,7 +22,8 @@ public class S3ClientErrorWrapper implements Processor {
 
         if (response.getException() != null) {
             var exception = response.getException(Exception.class);
-            exchange.getOut().setBody(new ResponseEntity<>(exception.getLocalizedMessage(),  exception instanceof S3Exception ? HttpStatusCode.valueOf(((S3Exception)exception).statusCode()) : HttpStatusCode.valueOf(400)));
+            exchange.getOut().setBody(new ResponseEntity<>(exception.getLocalizedMessage(),
+                    exception instanceof S3Exception ? HttpStatusCode.valueOf(((S3Exception) exception).statusCode()) : HttpStatusCode.valueOf(400)));
             exchange.setException(null);
         }
 

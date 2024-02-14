@@ -20,24 +20,24 @@ public class S3RESTRouteBuilder extends RouteBuilder {
         errorHandler(deadLetterChannel(ExceptionRouteBuilder.EXCEPTION_HANDLING).useOriginalMessage());
 
         /**
-        GET /filesInFolder
-        **/
+         * GET /filesInFolder
+         **/
         rest()
-            .get("/filesInFolder")
+                .get("/filesInFolder")
                 .description("")
                 .produces("application/json")
                 .outType(BucketContent[].class)
                 .param()
-                    .name("bucketName")
-                    .type(RestParamType.query)
-                    .required(true)
-                    .description("Bucket name")
+                .name("bucketName")
+                .type(RestParamType.query)
+                .required(true)
+                .description("Bucket name")
                 .endParam()
                 .param()
-                    .name("path")
-                    .type(RestParamType.query)
-                    .required(false)
-                    .description("S3 path")
+                .name("path")
+                .type(RestParamType.query)
+                .required(false)
+                .description("S3 path")
                 .endParam()
                 .to(S3RouteBuilder.OPERATION_COMMON);
 
