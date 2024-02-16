@@ -1,14 +1,17 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.exception.MobidamException;
+import de.muenchen.mobidam.rest.ErrorResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.apache.camel.tooling.model.Strings;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import org.apache.camel.ValidationException;
 
 @Component
 public class S3OperationWrapper implements Processor {
@@ -21,6 +24,11 @@ public class S3OperationWrapper implements Processor {
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
+            if (Strings.isNullOrEmpty(bucketName)) {
+                ErrorResponse res = ErrorResponseBuilder.build(400, "Bucket name is empty");
+                exchange.getMessage().setBody(res);
+                throw new ValidationException(exchange, "Bucket name is empty");
+            }
             var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
             if (prefix != null)
                 exchange.getIn().setBody(ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build());
@@ -30,8 +38,9 @@ public class S3OperationWrapper implements Processor {
             exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
             break;
         default:
-            exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
-
+            ErrorResponse res = ErrorResponseBuilder.build(404, "REST ContextPath not found : " + contextPath);
+            exchange.getMessage().setBody(res);
+            throw new MobidamException("REST ContextPath not found : " + contextPath);
         }
     }
 

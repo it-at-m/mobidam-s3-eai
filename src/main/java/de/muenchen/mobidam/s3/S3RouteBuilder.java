@@ -5,7 +5,10 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -23,11 +26,23 @@ public class S3RouteBuilder extends RouteBuilder {
     @Override
     public void configure() {
 
+        onException(Exception.class)
+                .handled(true)
+                .process(exchange -> {
+                    if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
+                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
+                    } else {
+                        Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
+                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getLocalizedMessage());
+                        exchange.getMessage().setBody(res);
+                    }
+                });
+
         from(OPERATION_COMMON)
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
-                .process("s3ClientErrorWrapper")
+                .process("s3ClientResponseProcessor")
                 .process("restResponseWrapper");
 
         from(S3Client).routeId("S3-Request").routeDescription("Execute S3 Operation")

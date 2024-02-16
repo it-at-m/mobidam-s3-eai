@@ -20,7 +20,17 @@ components:
             type: string
           size:
             type: number
-paths: 
+    ErrorResponse:
+      type: object
+      properties:
+          timestamp:
+            type: string
+            format: date-time
+          error:
+            type: string
+          status:
+            type: number
+paths:
   /filesInFolder:
     get:
       tags:
@@ -48,3 +58,15 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/BucketContent'
+        '4XX':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '5XX':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
