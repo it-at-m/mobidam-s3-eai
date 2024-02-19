@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -40,7 +41,7 @@ import java.nio.file.Path;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/RestRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
-@ActiveProfiles("limit")
+@TestPropertySource(properties = {"mobidam.limit.search.items=1"})
 @EnableAutoConfiguration
 @DirtiesContext
 class S3FileLimitTest {
