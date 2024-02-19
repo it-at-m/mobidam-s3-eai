@@ -45,7 +45,3 @@ info:
     name: @project.artifactId@
     version: @project.version@
 
-logging:
-  level:
-    org:
-      springframework: INFO
