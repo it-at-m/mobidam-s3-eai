@@ -113,7 +113,8 @@ class S3ObjectTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertTrue(json.contains("<200 OK OK,[BucketContent(key=File_1.csv,"));
+        Assertions.assertTrue(json.startsWith("<200 OK OK,[BucketContent(key=File_1.csv,"));
+        Assertions.assertTrue(json.endsWith("size=15)],[]>"));
 
     }
 

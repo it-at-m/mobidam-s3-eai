@@ -117,7 +117,8 @@ class S3FileLimitTest {
                 .build();
         var response = producer.send(openapiRequest);
         var json = response.getOut().getBody(String.class);
-        Assertions.assertEquals("<400 BAD_REQUEST Bad Request,Request supply limit 1 is exceeded.,[]>", json);
+        Assertions.assertTrue(json.startsWith("<200 OK OK,[BucketContent(key=File_1.csv,"));
+        Assertions.assertTrue(json.endsWith("size=15)],[MOBIDAM_WARN:\"Request supply limit 1 is exceeded.\"]>"));
 
     }
 

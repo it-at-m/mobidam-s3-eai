@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -47,11 +48,11 @@ public class RestResponseWrapper implements Processor {
 
         var objects = exchange.getIn().getBody(Collection.class);
 
+        HttpHeaders responseHeaders = null;
         if (objects.size() > maxS3ObjectItems) {
-            var responseException = new ResponseEntity<>(String.format("Request supply limit %s is exceeded.", maxS3ObjectItems), HttpStatusCode.valueOf(400));
-            exchange.getOut().setBody(responseException);
-            exchange.setException(null);
-            return;
+            responseHeaders = new HttpHeaders();
+            responseHeaders.set(Constants.MOBIDAM_WARN, String.format("Request supply limit %s is exceeded.", maxS3ObjectItems));
+            objects = objects.stream().limit(maxS3ObjectItems).toList();
         }
 
         var files = new ArrayList<BucketContent>();
@@ -64,8 +65,7 @@ public class RestResponseWrapper implements Processor {
             files.add(file);
 
         });
-        var response = new ResponseEntity<>(files, HttpStatusCode.valueOf(200));
-        exchange.getOut().setBody(response);
+         exchange.getOut().setBody( new ResponseEntity<>(files, responseHeaders, HttpStatusCode.valueOf(200)));
     }
 
 }
