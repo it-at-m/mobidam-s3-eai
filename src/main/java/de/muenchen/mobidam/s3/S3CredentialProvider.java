@@ -12,7 +12,6 @@ import java.util.Map;
 
 /**
  * This class provides the credentials for S3 buckets.
- *
  * It takes the configured environment variables from the properties, reads their content
  * and provides them as message headers.
  */
