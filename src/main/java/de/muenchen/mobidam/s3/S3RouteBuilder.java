@@ -12,6 +12,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,10 +33,12 @@ public class S3RouteBuilder extends RouteBuilder {
                         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
-                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getLocalizedMessage());
+                        log.error("Error occured in route", exception);
+                        ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
                         exchange.getMessage().setBody(res);
                     }
-                });
+                })
+                .stop();
 
         from(OPERATION_COMMON)
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")

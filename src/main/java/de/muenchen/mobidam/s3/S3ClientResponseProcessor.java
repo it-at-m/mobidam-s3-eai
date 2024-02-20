@@ -13,13 +13,7 @@ public class S3ClientResponseProcessor implements Processor {
     ProducerTemplate s3Client;
 
     @Override
-    public void process(Exchange exchange) throws Exception {
-
-        var response = s3Client.send(exchange);
-
-        if (response.getException() != null) {
-            throw response.getException();
-        }
-
+    public void process(Exchange exchange) {
+        s3Client.send(exchange);
     }
 }
