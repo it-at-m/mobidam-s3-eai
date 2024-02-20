@@ -11,11 +11,10 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
-
- This class provides the credentials for S3 buckets.
-
- It takes the configured environment variables from the properties, reads their content
- and provides them as message headers.
+ * This class provides the credentials for S3 buckets.
+ *
+ * It takes the configured environment variables from the properties, reads their content
+ * and provides them as message headers.
  */
 @Component
 @RequiredArgsConstructor
@@ -28,12 +27,12 @@ public class S3CredentialProvider implements Processor {
         String bucketName = exchange.getMessage().getHeader(Constants.BUCKET_NAME, String.class);
         Map<String, S3BucketCredentialConfig.S3Credentials> map = properties.getS3BucketCredentials();
         S3BucketCredentialConfig.S3Credentials envVar = map.get(bucketName);
-        if (envVar == null){
+        if (envVar == null) {
             throw new Exception("Configuration for bucket " + bucketName + " not found");
         }
         String accessKey = System.getenv(envVar.getAccessKeyEnvVar());
         String secretKey = System.getenv(envVar.getSecretKeyEnvVar());
-        if (Strings.isNullOrEmpty(accessKey) || Strings.isNullOrEmpty(secretKey)){
+        if (Strings.isNullOrEmpty(accessKey) || Strings.isNullOrEmpty(secretKey)) {
             throw new Exception("Credentials for bucket " + bucketName + " not configured");
         }
         exchange.getMessage().setHeader(Constants.ACCESS_KEY, accessKey);
