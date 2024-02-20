@@ -7,16 +7,20 @@ camel:
       context-path: /api/*
   component:
     aws2-s3:
-      access-key: ...
-      secret-key: ...
-      override-endpoint: ...
-      bucket: ...
-      region: ...
+      override-endpoint: https://s3k.muenchen.de
+      region: eu-central-1
 
 mobidam:
   limit:
     search:
       items: 20
+  s3-bucket-credentials:
+    x-itmkm82k:
+      access-key-env-var: MOBIDAM_X-ITMKM82K_ACCESS_KEY
+      secret-key-env-var: MOBIDAM_X-ITMKM82K_SECRET_KEY
+    int-mdasc-mdasdev:
+      access-key-env-var: MOBIDAM_INT-MDASC-MDASDEV_ACCESS_KEY
+      secret-key-env-var: MOBIDAM_INT-MDASC-MDASDEV_SECRET_KEY
 
 spring:
   application:
