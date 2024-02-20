@@ -54,9 +54,6 @@ class S3PrefixTest {
 
     private static LocalS3 localS3;
 
-    @Autowired
-    private S3Client s3Client;
-
     private static S3Client s3InitClient;
 
     // Same as camel.component.aws2-s3.bucket
