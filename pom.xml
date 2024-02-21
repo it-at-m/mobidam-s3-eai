@@ -42,46 +42,9 @@
 
         <!-- Other -->
         <org.projectlombok.lombok.version>1.18.26</org.projectlombok.lombok.version>
-        <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     </properties>
-
-    <profiles>
-        <profile>
-            <id>generate-openapi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.openapitools</groupId>
-                        <artifactId>openapi-generator-maven-plugin</artifactId>
-                        <version>${openapi-generator-maven-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                                <configuration>
-                                    <inputSpec>${project.basedir}/src/main/resources/openapi_rest_s3_v1.yaml</inputSpec>
-                                    <!--
-                                       https://openapi-generator.tech/docs/plugins
-                                       https://openapi-generator.tech/docs/generators/java-camel
-                                    -->
-                                    <generatorName>java-camel</generatorName>
-                                    <configOptions>
-                                        <sourceFolder>src/gen/java/main</sourceFolder>
-                                        <apiPackage>de.muenchen.mobidam.rest</apiPackage>
-                                        <modelPackage>de.muenchen.mobidam.rest</modelPackage>
-                                        <useSpringBoot3>true</useSpringBoot3>
-                                    </configOptions>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <scm>
         <connection>scm:git:http://git.muenchen.de/[YOUR PROJECT]</connection>
@@ -123,6 +86,11 @@
             <artifactId>camel-servlet-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-jackson-starter</artifactId>
+        </dependency>
+
         <!--  Spring-Boot-Actuator (https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.enabling) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -149,16 +117,6 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-rest-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.7.0</version>
         </dependency>
 
         <!-- Test -->
@@ -191,6 +149,7 @@
             <version>1.10</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-http-starter</artifactId>

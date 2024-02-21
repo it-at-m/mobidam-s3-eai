@@ -5,6 +5,7 @@
  */
 package de.muenchen.mobidam.rest;
 
+import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import de.muenchen.mobidam.s3.S3RouteBuilder;
 import org.apache.camel.builder.RouteBuilder;
@@ -23,18 +24,18 @@ public class RestRouteBuilder extends RouteBuilder {
          * GET /filesInFolder
          **/
         rest()
-                .get("/filesInFolder")
+                .get("/" + Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .description("")
                 .produces("application/json")
-                .outType(BucketContent[].class)
+                .outType(OkResponse.class)
                 .param()
-                .name("bucketName")
+                .name(Constants.BUCKET_NAME)
                 .type(RestParamType.query)
                 .required(true)
                 .description("Bucket name")
                 .endParam()
                 .param()
-                .name("path")
+                .name(Constants.PATH_ALIAS_PREFIX)
                 .type(RestParamType.query)
                 .required(false)
                 .description("S3 path")

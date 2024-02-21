@@ -1,12 +1,11 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 
@@ -30,8 +29,7 @@ public class S3OperationWrapper implements Processor {
             exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
             break;
         default:
-            exchange.getOut().setBody(new ResponseEntity<>("REST ContextPath not found : " + contextPath, HttpStatusCode.valueOf(400)));
-
+            exchange.getMessage().setBody(ErrorResponseBuilder.build(404, "REST ContextPath not found : " + contextPath));
         }
     }
 
