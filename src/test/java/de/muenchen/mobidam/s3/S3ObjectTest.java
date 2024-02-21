@@ -7,12 +7,12 @@ package de.muenchen.mobidam.s3;
 import com.robothy.s3.rest.LocalS3;
 import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
+import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.rest.OkResponse;
 import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
-import org.apache.camel.http.common.HttpMethods;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +30,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -37,13 +38,13 @@ import java.nio.file.Path;
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.springboot.java-routes-include-pattern=**/RestRouteBuilder,**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+        properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
 @EnableAutoConfiguration
 @DirtiesContext
 class S3ObjectTest {
 
-    @Produce("http:127.0.0.1:8081/filesInFolder")
+    @Produce(S3RouteBuilder.OPERATION_COMMON)
     private ProducerTemplate producer;
 
     @Value("${camel.component.aws2-s3.bucket}")
@@ -101,20 +102,22 @@ class S3ObjectTest {
     }
 
     @Test
-    public void test_RouteWithListObjectTest() {
+    public void test_RouteWithListObjectTest() throws IOException {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
-        var openapiRequest = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Exchange.HTTP_METHOD, HttpMethods.GET)
-                .withHeader(Exchange.HTTP_URI, "http://127.0.0.1:8081/api/filesInFolder?bucketName=" + bucket)
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
+                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .build();
-        var response = producer.send(openapiRequest);
-        var json = response.getOut().getBody(String.class);
-        Assertions.assertTrue(json.startsWith("<200 OK OK,[BucketContent(key=File_1.csv,"));
-        Assertions.assertTrue(json.endsWith("size=15)],[]>"));
+        var response = producer.send(s3Request);
+
+        var okResponse = response.getIn().getBody(OkResponse.class);
+        Assertions.assertEquals(200, okResponse.getHttpStatusCode());
+        Assertions.assertEquals(1, okResponse.getObjects().size());
+        Assertions.assertEquals("File_1.csv", okResponse.getObjects().get(0).getKey());
 
     }
 
