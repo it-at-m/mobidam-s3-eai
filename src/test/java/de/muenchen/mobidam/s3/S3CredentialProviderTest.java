@@ -101,11 +101,11 @@ public class S3CredentialProviderTest {
 
     private void configureEnvironment(String bucketName, String envVar, String value) {
         Mockito.when(environmentReader.getEnvironmentVariable(envVar)).thenReturn(value);
-        S3BucketCredentialConfig.S3Credentials envVars = new S3BucketCredentialConfig.S3Credentials();
+        S3BucketCredentialConfig.BucketCredentialConfig envVars = new S3BucketCredentialConfig.BucketCredentialConfig();
         envVars.setAccessKeyEnvVar(envVar);
         envVars.setSecretKeyEnvVar(envVar);
-        Map<String, S3BucketCredentialConfig.S3Credentials> map = new HashMap<>();
+        Map<String, S3BucketCredentialConfig.BucketCredentialConfig> map = new HashMap<>();
         map.put(bucketName, envVars);
-        Mockito.when(properties.getS3BucketCredentials()).thenReturn(map);
+        Mockito.when(properties.getBucketCredentialConfig()).thenReturn(map);
     }
 }

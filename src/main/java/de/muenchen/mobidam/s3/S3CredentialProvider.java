@@ -27,7 +27,7 @@ public class S3CredentialProvider implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String bucketName = verifyBucket(exchange);
-        S3BucketCredentialConfig.S3Credentials credentials = verifyCredentials(bucketName);
+        S3BucketCredentialConfig.BucketCredentialConfig credentials = verifyCredentials(bucketName);
         String accessKey = environmentReader.getEnvironmentVariable(credentials.getAccessKeyEnvVar());
         String secretKey = environmentReader.getEnvironmentVariable(credentials.getSecretKeyEnvVar());
         if (Strings.isNullOrEmpty(accessKey) || Strings.isNullOrEmpty(secretKey)) {
@@ -45,9 +45,9 @@ public class S3CredentialProvider implements Processor {
         return bucketName;
     }
 
-    private S3BucketCredentialConfig.S3Credentials verifyCredentials(String bucketName) throws MobidamException {
-        Map<String, S3BucketCredentialConfig.S3Credentials> map = properties.getS3BucketCredentials();
-        S3BucketCredentialConfig.S3Credentials envVars = map.get(bucketName);
+    private S3BucketCredentialConfig.BucketCredentialConfig verifyCredentials(String bucketName) throws MobidamException {
+        Map<String, S3BucketCredentialConfig.BucketCredentialConfig> map = properties.getBucketCredentialConfig();
+        S3BucketCredentialConfig.BucketCredentialConfig envVars = map.get(bucketName);
         if (envVars == null) {
             throw new MobidamException("Configuration for bucket " + bucketName + " not found");
         }

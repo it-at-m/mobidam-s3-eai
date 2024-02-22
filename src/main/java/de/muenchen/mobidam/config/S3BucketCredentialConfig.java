@@ -12,16 +12,16 @@ import java.util.Map;
  * It contains a map of S3Credentials objects, with the keys being the names of the S3 buckets.
  */
 @Component
-@ConfigurationProperties(prefix = "mobidam")
+@ConfigurationProperties(prefix = "mobidam.s3")
 @Getter
 @Setter
 public class S3BucketCredentialConfig {
 
-    private Map<String, S3Credentials> s3BucketCredentials;
+    private Map<String, BucketCredentialConfig> bucketCredentialConfig;
 
     @Getter
     @Setter
-    public static class S3Credentials {
+    public static class BucketCredentialConfig {
 
         private String accessKeyEnvVar;
         private String secretKeyEnvVar;
