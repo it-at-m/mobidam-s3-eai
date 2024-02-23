@@ -6,6 +6,7 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.rest.BucketContentInner;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,7 +52,7 @@ class S3IntegrationTest {
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send(exchange);
         var objects = bucketResponse.getIn().getBody(ArrayList.class);
-        Assertions.assertEquals("Test.csv", ((S3Object) objects.stream().toList().get(0)).key());
+        Assertions.assertEquals("Test.csv", ((BucketContentInner) objects.stream().toList().get(0)).getKey());
 
     }
 
@@ -66,9 +66,9 @@ class S3IntegrationTest {
         var bucketResponse = producer.send(exchange);
         var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
 
-        S3Object object = (S3Object) objectsCollection.iterator().next();
+        var object = (BucketContentInner) objectsCollection.iterator().next();
 
-        exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.KEY, object.key()).build();
+        exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.KEY, object.getKey()).build();
 
         bucketResponse = producer.send(S3RouteBuilder.OPERATION_CREATE_LINK, exchange);
 

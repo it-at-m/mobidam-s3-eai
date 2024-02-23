@@ -9,6 +9,9 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.ErrorResponse;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -19,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -31,10 +33,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @CamelSpringBootTest
 @SpringBootTest(
@@ -48,16 +46,10 @@ class S3BucketTest {
     @Produce(S3RouteBuilder.OPERATION_COMMON)
     private ProducerTemplate producer;
 
-    @Value("${camel.component.aws2-s3.bucket}")
-    private String bucket;
-
     @Autowired
     private CamelContext camelContext;
 
     private static LocalS3 localS3;
-
-    @Autowired
-    private S3Client s3Client;
 
     private static S3Client s3InitClient;
 
@@ -103,7 +95,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameParameterNotExistTest() throws IOException {
+    public void test_RouteWithBucketNameParameterNotExistTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -111,12 +103,12 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getError());
-        Assertions.assertEquals(400, error.getStatus());
+        Assertions.assertEquals("Bucket name is empty", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
     }
 
     @Test
-    public void test_RouteWithBucketNameNotFoundTest() throws IOException {
+    public void test_RouteWithBucketNameNotFoundTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -125,13 +117,13 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertTrue(error.getError().startsWith("Bucket 'foo' not exist. (Service: S3, Status Code: 404"));
-        Assertions.assertEquals(404, error.getStatus());
+        Assertions.assertTrue(error.getError().startsWith("software.amazon.awssdk.services.s3.model.NoSuchBucketException"));
+        Assertions.assertEquals(BigDecimal.valueOf(404), error.getStatus());
 
     }
 
     @Test
-    public void test_RouteWithBucketNameNullTest() throws IOException {
+    public void test_RouteWithBucketNameNullTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -140,12 +132,12 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getError());
-        Assertions.assertEquals(400, error.getStatus());
+        Assertions.assertEquals("Bucket name is empty", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
     }
 
     @Test
-    public void test_RouteWithBucketNameEmptyTest() throws IOException {
+    public void test_RouteWithBucketNameEmptyTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -154,8 +146,8 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Bucket cannot be empty.", error.getError());
-        Assertions.assertEquals(400, error.getStatus());
+        Assertions.assertEquals("Bucket name is empty", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
     }
 
 }
