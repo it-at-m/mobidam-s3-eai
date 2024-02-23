@@ -26,6 +26,8 @@ camel:
       override-endpoint: http://127.0.0.1:8080
       bucket: test-bucket
       region: local
+  route:
+    common: direct:commonOperations
 
 mobidam:
   limit:

@@ -36,7 +36,7 @@ public class S3Api extends RouteBuilder {
                 .required(false)
                 .description("S3 path")
                 .endParam()
-                .to("direct:commonOperations");
+                .to("{{camel.route.common}}");
 
     }
 }

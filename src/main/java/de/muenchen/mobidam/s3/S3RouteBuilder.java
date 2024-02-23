@@ -40,7 +40,7 @@ public class S3RouteBuilder extends RouteBuilder {
         onException(Exception.class)
                 .handled(true)
                 .process(exchange -> {
-                    if (exchange.getMessage().getBody() instanceof ErrorResponse res) {
+                    if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
                         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
