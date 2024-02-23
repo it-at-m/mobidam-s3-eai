@@ -111,7 +111,7 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getMessage());
+        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getError());
         Assertions.assertEquals(400, error.getStatus());
     }
 
@@ -125,7 +125,7 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertTrue(error.getMessage().startsWith("Bucket 'foo' not exist. (Service: S3, Status Code: 404"));
+        Assertions.assertTrue(error.getError().startsWith("Bucket 'foo' not exist. (Service: S3, Status Code: 404"));
         Assertions.assertEquals(404, error.getStatus());
 
     }
@@ -140,7 +140,7 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getMessage());
+        Assertions.assertEquals("Unable to marshall request to JSON: Parameter 'Bucket' must not be null", error.getError());
         Assertions.assertEquals(400, error.getStatus());
     }
 
@@ -154,7 +154,7 @@ class S3BucketTest {
         var response = producer.send(s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Unable to marshall request to JSON: Bucket cannot be empty.", error.getMessage());
+        Assertions.assertEquals("Unable to marshall request to JSON: Bucket cannot be empty.", error.getError());
         Assertions.assertEquals(400, error.getStatus());
     }
 

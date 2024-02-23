@@ -2,10 +2,12 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.rest.BucketContent;
-import de.muenchen.mobidam.rest.OkResponse;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import de.muenchen.mobidam.rest.BucketContentInner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -21,7 +23,7 @@ public class RestResponseWrapper implements Processor {
     private int maxS3ObjectItems;
 
     @Override
-    public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) {
 
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
         switch (contextPath) {
@@ -42,13 +44,17 @@ public class RestResponseWrapper implements Processor {
             log.warn("More than {} objects in storage", maxS3ObjectItems);
         }
 
-        var files = new ArrayList<BucketContent>();
+        var files = new ArrayList<BucketContentInner>();
 
         objects.stream().limit(maxS3ObjectItems).forEach(object -> {
             var s3Object = (S3Object) object;
-            files.add(new BucketContent(s3Object.key(), s3Object.lastModified().toString(), s3Object.size()));
+            BucketContentInner content = new BucketContentInner();
+            content.setKey(s3Object.key());
+            content.setLastmodified(s3Object.lastModified().toString());
+            content.setSize(BigDecimal.valueOf(s3Object.size()));
+            files.add(content);
         });
-        exchange.getMessage().setBody(new OkResponse(200, files));
+        exchange.getMessage().setBody(files);
     }
 
 }

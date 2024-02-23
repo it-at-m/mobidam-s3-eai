@@ -7,10 +7,10 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
+import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
@@ -23,7 +23,6 @@ public class S3RouteBuilder extends RouteBuilder {
 
     public static final String OPERATION_COMMON = "direct:commonOperations";
     public static final String OPERATION_CREATE_LINK = "direct:createLink";
-    public static final String S3Client = "direct:s3client";
 
     @Override
     public void configure() {
@@ -34,14 +33,21 @@ public class S3RouteBuilder extends RouteBuilder {
                 .handled(true)
                 .process(exchange -> {
                     var s3Exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, S3Exception.class);
-                    exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getLocalizedMessage()));
+                    log.error("Error occurred in route", s3Exception);
+                    exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getClass().getName()));
                 });
 
         onException(Exception.class)
                 .handled(true)
                 .process(exchange -> {
-                    var exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
-                    exchange.getMessage().setBody(ErrorResponseBuilder.build(400, exception.getLocalizedMessage()));
+                    if (exchange.getMessage().getBody() instanceof ErrorResponse res) {
+                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
+                    } else {
+                        Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
+                        log.error("Error occurred in route", exception);
+                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getClass().getName());
+                        exchange.getMessage().setBody(res);
+                    }
                 });
 
         from(OPERATION_COMMON)

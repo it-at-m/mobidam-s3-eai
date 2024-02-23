@@ -8,7 +8,7 @@ import com.robothy.s3.rest.LocalS3;
 import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.rest.OkResponse;
+import de.muenchen.mobidam.rest.BucketContentInner;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.List;
 
 @CamelSpringBootTest
 @SpringBootTest(
@@ -117,11 +118,10 @@ class S3FileLimitTest {
                 .build();
         var response = producer.send(s3Request);
 
-        var okResponse = response.getIn().getBody(OkResponse.class);
+        List<BucketContentInner> files = response.getIn().getBody(List.class);
 
-        Assertions.assertEquals(200, okResponse.getHttpStatusCode());
-        Assertions.assertEquals(1, okResponse.getObjects().size());
-        Assertions.assertEquals("File_1.csv", okResponse.getObjects().get(0).getKey());
+        Assertions.assertEquals(1, files.size());
+        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
 
     }
 
