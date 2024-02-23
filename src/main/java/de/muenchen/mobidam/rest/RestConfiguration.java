@@ -14,10 +14,10 @@ public class RestConfiguration extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         restConfiguration()
-            .scheme("https")
-            .host("localhost")
-            .component("servlet")
-            .bindingMode(RestBindingMode.auto)
-            .clientRequestValidation(false);
+                .scheme("https")
+                .host("localhost")
+                .component("servlet")
+                .bindingMode(RestBindingMode.auto)
+                .clientRequestValidation(false);
     }
 }

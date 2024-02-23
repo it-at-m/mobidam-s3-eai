@@ -8,39 +8,35 @@ package de.muenchen.mobidam.rest;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
-import de.muenchen.mobidam.rest.*;
-import org.apache.camel.model.rest.RestBindingMode;
-import org.apache.camel.LoggingLevel;
 
 @Component
 public class S3Api extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        
 
         /**
-        GET /filesInFolder
-        **/
+         * GET /filesInFolder
+         **/
         rest()
-            .get("/filesInFolder")
+                .get("/filesInFolder")
                 .description("")
                 .id("filesInFolderGetApi")
                 .produces("application/json")
                 .outType(BucketContentInner[].class)
                 .param()
-                    .name("bucketName")
-                    .type(RestParamType.query)
-                    .required(true)
-                    .description("Bucket name")
+                .name("bucketName")
+                .type(RestParamType.query)
+                .required(true)
+                .description("Bucket name")
                 .endParam()
                 .param()
-                    .name("path")
-                    .type(RestParamType.query)
-                    .required(false)
-                    .description("S3 path")
+                .name("path")
+                .type(RestParamType.query)
+                .required(false)
+                .description("S3 path")
                 .endParam()
                 .to("direct:commonOperations");
-        
+
     }
 }

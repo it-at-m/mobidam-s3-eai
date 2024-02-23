@@ -2,12 +2,10 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-
+import de.muenchen.mobidam.rest.BucketContentInner;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import de.muenchen.mobidam.rest.BucketContentInner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

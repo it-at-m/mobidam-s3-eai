@@ -1,7 +1,6 @@
 package de.muenchen.mobidam.exception;
 
 import de.muenchen.mobidam.rest.ErrorResponse;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
