@@ -11,7 +11,6 @@ import org.apache.camel.component.aws2.s3.AWS2S3Operations;
 import org.apache.camel.tooling.model.Strings;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import org.apache.camel.ValidationException;
 
 @Component
 public class S3OperationWrapper implements Processor {
@@ -27,7 +26,7 @@ public class S3OperationWrapper implements Processor {
             if (Strings.isNullOrEmpty(bucketName)) {
                 ErrorResponse res = ErrorResponseBuilder.build(400, "Bucket name is empty");
                 exchange.getMessage().setBody(res);
-                throw new ValidationException(exchange, "Bucket name is empty");
+                throw new MobidamException("Bucket name is empty");
             }
             var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
             if (prefix != null)

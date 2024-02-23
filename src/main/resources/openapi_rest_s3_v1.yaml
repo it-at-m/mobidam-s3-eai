@@ -3,7 +3,7 @@ info:
   title: S3-EAI API
   version: v1
 tags:
-- name: Files
+- name: S3
   description: Files related operations
 servers:
 - url: https://localhost:8080
@@ -34,7 +34,7 @@ paths:
   /filesInFolder:
     get:
       tags:
-      - Files
+      - S3
       description: Get S3 bucket object list
       parameters:
       - name: bucketName

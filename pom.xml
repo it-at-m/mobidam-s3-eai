@@ -72,7 +72,9 @@
                                         <sourceFolder>src/gen/java/main</sourceFolder>
                                         <apiPackage>de.muenchen.mobidam.rest</apiPackage>
                                         <modelPackage>de.muenchen.mobidam.rest</modelPackage>
+                                        <configPackage>de.muenchen.mobidam.rest</configPackage>
                                         <useSpringBoot3>true</useSpringBoot3>
+                                        <annotationLibrary>swagger2</annotationLibrary>
                                     </configOptions>
                                 </configuration>
                             </execution>
@@ -123,6 +125,11 @@
             <artifactId>camel-servlet-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-jackson-starter</artifactId>
+        </dependency>
+
         <!--  Spring-Boot-Actuator (https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.enabling) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -149,10 +156,6 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-rest-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jackson</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
@@ -195,6 +198,7 @@
             <version>1.10</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-http-starter</artifactId>
@@ -208,6 +212,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
