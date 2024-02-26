@@ -43,7 +43,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 @DirtiesContext
 class S3BucketTest {
 
-    @Produce(S3RouteBuilder.OPERATION_COMMON)
+    @Produce()
     private ProducerTemplate producer;
 
     @Autowired
@@ -100,7 +100,7 @@ class S3BucketTest {
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
         Assertions.assertEquals("Bucket name is empty", error.getError());
@@ -114,7 +114,7 @@ class S3BucketTest {
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, "foo")
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
         Assertions.assertTrue(error.getError().startsWith("software.amazon.awssdk.services.s3.model.NoSuchBucketException"));
@@ -129,7 +129,7 @@ class S3BucketTest {
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, null)
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
         Assertions.assertEquals("Bucket name is empty", error.getError());
@@ -143,7 +143,7 @@ class S3BucketTest {
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, "")
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
         Assertions.assertEquals("Bucket name is empty", error.getError());

@@ -9,6 +9,11 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -29,13 +34,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.List;
-
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -45,7 +43,7 @@ import java.util.List;
 @DirtiesContext
 class S3ObjectTest {
 
-    @Produce(S3RouteBuilder.OPERATION_COMMON)
+    @Produce()
     private ProducerTemplate producer;
 
     @Value("${camel.component.aws2-s3.bucket}")
@@ -103,7 +101,7 @@ class S3ObjectTest {
     }
 
     @Test
-    public void test_RouteWithListObjectTest() throws IOException {
+    public void test_RouteWithListObjectTest() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
@@ -113,7 +111,7 @@ class S3ObjectTest {
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(1, files.size());

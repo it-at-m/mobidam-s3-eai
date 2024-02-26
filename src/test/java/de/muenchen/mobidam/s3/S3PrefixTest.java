@@ -9,6 +9,11 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -29,13 +34,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.List;
-
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -45,7 +43,7 @@ import java.util.List;
 @DirtiesContext
 class S3PrefixTest {
 
-    @Produce(S3RouteBuilder.OPERATION_COMMON)
+    @Produce()
     private ProducerTemplate producer;
 
     @Value("${camel.component.aws2-s3.bucket}")
@@ -108,13 +106,13 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixTest() throws IOException {
+    public void test_RouteWithNoPrefixTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(2, files.size());
@@ -124,14 +122,14 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixTest() throws IOException {
+    public void test_RouteWithPrefixTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .withHeader(Constants.PATH_ALIAS_PREFIX, "archive")
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(1, files.size());
@@ -140,14 +138,14 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixNoMatchTest() throws IOException {
+    public void test_RouteWithPrefixNoMatchTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .withHeader(Constants.PATH_ALIAS_PREFIX, "noMatch")
                 .build();
-        var response = producer.send(s3Request);
+        var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(0, files.size());

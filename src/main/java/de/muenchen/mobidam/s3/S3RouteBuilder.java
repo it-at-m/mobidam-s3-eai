@@ -21,7 +21,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @RequiredArgsConstructor
 public class S3RouteBuilder extends RouteBuilder {
 
-    public static final String OPERATION_COMMON = "direct:commonOperations";
     public static final String OPERATION_CREATE_LINK = "direct:createLink";
 
     @Override
@@ -50,7 +49,7 @@ public class S3RouteBuilder extends RouteBuilder {
                     }
                 });
 
-        from(OPERATION_COMMON)
+        from("{{camel.route.common}}")
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")

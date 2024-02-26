@@ -31,7 +31,7 @@ import java.util.Collection;
 @ActiveProfiles("integration")
 class S3IntegrationTest {
 
-    @Produce(S3RouteBuilder.OPERATION_COMMON)
+    @Produce()
     private ProducerTemplate producer;
 
     @Value("${camel.component.aws2-s3.bucket}")
@@ -50,7 +50,7 @@ class S3IntegrationTest {
         var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
                 .withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
-        var bucketResponse = producer.send(exchange);
+        var bucketResponse = producer.send("{{camel.route.common}}", exchange);
         var objects = bucketResponse.getIn().getBody(ArrayList.class);
         Assertions.assertEquals("Test.csv", ((BucketContentInner) objects.stream().toList().get(0)).getKey());
 
@@ -63,7 +63,7 @@ class S3IntegrationTest {
         var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
                 .withHeader("bucketName", bucket).build();
         exchange.getIn().setBody(s3RequestObjects);
-        var bucketResponse = producer.send(exchange);
+        var bucketResponse = producer.send("{{camel.route.common}}", exchange);
         var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
 
         var object = (BucketContentInner) objectsCollection.iterator().next();
