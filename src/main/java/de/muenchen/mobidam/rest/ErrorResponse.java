@@ -1,20 +1,18 @@
 package de.muenchen.mobidam.rest;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Generated;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.validation.Valid;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import jakarta.annotation.Generated;
 
 /**
  * ErrorResponse
  */
-
-@Generated(value = "org.openapitools.codegen.languages.JavaCamelServerCodegen", date = "2024-02-16T13:05:01.335444300+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.JavaCamelServerCodegen", date = "2024-02-23T10:49:31.241207800+01:00[Europe/Berlin]")
 public class ErrorResponse {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
