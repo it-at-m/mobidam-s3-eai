@@ -1,4 +1,4 @@
-package de.muenchen.mobidam.common;
+package de.muenchen.mobidam.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

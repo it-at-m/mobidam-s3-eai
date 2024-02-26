@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -39,15 +39,16 @@ import software.amazon.awssdk.services.s3.model.*;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
+@TestPropertySource(properties = {
+        "FOO_ACCESS_KEY=foo",
+        "FOO_SECRET_KEY=bar"
+})
 @EnableAutoConfiguration
 @DirtiesContext
 class S3ObjectTest {
 
     @Produce()
     private ProducerTemplate producer;
-
-    @Value("${camel.component.aws2-s3.bucket}")
-    private String bucket;
 
     @Autowired
     private CamelContext camelContext;
@@ -56,7 +57,6 @@ class S3ObjectTest {
 
     private static S3Client s3InitClient;
 
-    // Same as camel.component.aws2-s3.bucket
     private static final String TEST_BUCKET = "test-bucket";
 
     @BeforeAll

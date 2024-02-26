@@ -1,7 +1,7 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.common.EnvironmentReader;
+import de.muenchen.mobidam.config.EnvironmentReader;
 import de.muenchen.mobidam.config.S3BucketCredentialConfig;
 import de.muenchen.mobidam.exception.MobidamException;
 import org.apache.camel.CamelContext;
