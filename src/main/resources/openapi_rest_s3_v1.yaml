@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: S3-EAI API
+  version: v1
+tags:
+- name: S3
+  description: Files related operations
+servers:
+- url: https://localhost:8080
+components:
+  schemas:
+    BucketContent:
+      type: array
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          lastmodified:
+            type: string
+          size:
+            type: number
+    ErrorResponse:
+      type: object
+      properties:
+          timestamp:
+            type: string
+            format: date-time
+          error:
+            type: string
+          status:
+            type: number
+paths:
+  /filesInFolder:
+    get:
+      tags:
+      - S3
+      description: Get S3 bucket object list
+      parameters:
+      - name: bucketName
+        description: Bucket name
+        in: query
+        schema:
+          type: string
+          example: MyBucketName
+        required: true
+      - name: path
+        description: S3 path
+        in: query
+        schema:
+          type: string
+          example: MyPathName
+        required: false  
+      responses:
+        '200':
+          description: Bucket content
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/BucketContent'
+        '4XX':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '5XX':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

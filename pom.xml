@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>de.muenchen</groupId>
-        <artifactId>muenchen-pom</artifactId>
-        <version>2.1.0</version>
-    </parent>
 
     <groupId>de.muenchen.mobidam</groupId>
     <artifactId>mobidam-s3-eai</artifactId>
@@ -31,7 +26,7 @@
         <!-- Other Maven Plugins -->
         <maven-scm-plugin.version>1.13.0</maven-scm-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
 
         <!-- SonarQube -->
         <sonar.scanner.version>3.9.0.2155</sonar.scanner.version>
@@ -47,7 +42,48 @@
 
         <!-- Other -->
         <org.projectlombok.lombok.version>1.18.26</org.projectlombok.lombok.version>
+        <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     </properties>
+
+    <profiles>
+        <profile>
+            <id>generate-openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>${openapi-generator-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <inputSpec>${project.basedir}/src/main/resources/openapi_rest_s3_v1.yaml</inputSpec>
+                                    <!--
+                                       https://openapi-generator.tech/docs/plugins
+                                       https://openapi-generator.tech/docs/generators/java-camel
+                                    -->
+                                    <generatorName>java-camel</generatorName>
+                                    <configOptions>
+                                        <sourceFolder>src/gen/java/main</sourceFolder>
+                                        <apiPackage>de.muenchen.mobidam.rest</apiPackage>
+                                        <modelPackage>de.muenchen.mobidam.rest</modelPackage>
+                                        <configPackage>de.muenchen.mobidam.rest</configPackage>
+                                        <useSpringBoot3>true</useSpringBoot3>
+                                        <annotationLibrary>swagger2</annotationLibrary>
+                                    </configOptions>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:http://git.muenchen.de/[YOUR PROJECT]</connection>
@@ -65,7 +101,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-             <!-- Spring Boot BOM -->
+            <!-- Spring Boot BOM -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -89,6 +125,11 @@
             <artifactId>camel-servlet-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-jackson-starter</artifactId>
+        </dependency>
+
         <!--  Spring-Boot-Actuator (https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.enabling) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -103,6 +144,28 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-aws2-s3</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- REST https://camel.apache.org/components/4.0.x/rest-api-component.html -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-rest-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
         </dependency>
 
         <!-- Test -->
@@ -123,6 +186,25 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.robothy</groupId>
+            <artifactId>local-s3-rest</artifactId>
+            <version>1.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.robothy</groupId>
+            <artifactId>local-s3-jupiter</artifactId>
+            <version>1.10</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-http-starter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Sonstiges -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -130,6 +212,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -185,21 +272,13 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>${maven-scm-plugin.version}</version>
-                <configuration>
-                    <tag>RT-REL-${project.version}</tag>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>${surefireArgLine}  -Dfile.encoding=${project.build.sourceEncoding}</argLine>
+                    <argLine>${surefireArgLine} -Dfile.encoding=${project.build.sourceEncoding}</argLine>
                 </configuration>
             </plugin>
 
@@ -291,6 +370,21 @@
                         <version>${checkstyle.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-help-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>show-profiles</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>active-profiles</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>

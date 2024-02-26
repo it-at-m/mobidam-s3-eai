@@ -1,11 +1,24 @@
 camel:
   springboot:
-#    Sollte sich der Camel Main Thread nach dem Start wieder beenden, folgende Property aktivieren (http://camel.apache.org/spring-boot.html).
     main-run-controller: true
     tracing: false
   servlet:
     mapping:
       context-path: /api/*
+  component:
+    aws2-s3:
+      access-key: ...
+      secret-key: ...
+      override-endpoint: ...
+      bucket: ...
+      region: ...
+  route:
+    common: direct:commonOperations
+
+mobidam:
+  limit:
+    search:
+      items: 20
 
 spring:
   application:
@@ -34,10 +47,3 @@ info:
     name: @project.artifactId@
     version: @project.version@
 
-logging:
-  level:
-    org:
-      springframework: INFO
-
-#  https://camel.apache.org/components/next/index.html
-output: direct:foo
