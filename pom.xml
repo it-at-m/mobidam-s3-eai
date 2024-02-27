@@ -36,7 +36,7 @@
 
         <!-- Code Formatting -->
         <checkstyle.version>9.3</checkstyle.version>
-        <maven-spotless-plugin.version>2.43.0</maven-spotless-plugin.version>
+        <maven-spotless-plugin.version>2.28.0</maven-spotless-plugin.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
         <itm-java-codeformat.version>1.0.9</itm-java-codeformat.version>
 

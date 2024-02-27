@@ -39,10 +39,12 @@ import software.amazon.awssdk.services.s3.model.*;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
-@TestPropertySource(properties = {
-        "FOO_ACCESS_KEY=foo",
-        "FOO_SECRET_KEY=bar"
-})
+@TestPropertySource(
+        properties = {
+                "FOO_ACCESS_KEY=foo",
+                "FOO_SECRET_KEY=bar"
+        }
+)
 @EnableAutoConfiguration
 @DirtiesContext
 class S3PrefixTest {

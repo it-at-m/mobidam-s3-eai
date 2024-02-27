@@ -53,7 +53,8 @@ public class S3CredentialProvider implements Processor {
         Map<String, S3BucketCredentialConfig.BucketCredentialConfig> map = properties.getBucketCredentialConfig();
         S3BucketCredentialConfig.BucketCredentialConfig envVars = map.get(bucketName);
         if (envVars == null) {
-            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Configuration for bucket not found: " + bucketName));
+            exchange.getMessage()
+                    .setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Configuration for bucket not found: " + bucketName));
             throw new MobidamException("Configuration for bucket not found: " + bucketName);
         }
         return envVars;
