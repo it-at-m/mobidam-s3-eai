@@ -8,18 +8,13 @@ import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import de.muenchen.mobidam.rest.ErrorResponse;
-import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
-import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.camel.Exchange;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
-import org.apache.camel.component.aws2.s3.AWS2S3Operations;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Component
@@ -49,7 +44,7 @@ public class S3RouteBuilder extends RouteBuilder {
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
                         log.error("Error occurred in route", exception);
-                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getClass().getName());
+                        ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
                 });
@@ -60,8 +55,8 @@ public class S3RouteBuilder extends RouteBuilder {
                 .process("s3OperationWrapper")
                 .process("s3CredentialProvider")
                 .toD(String.format(
-                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION))
+                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=${header.%s}",
+                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PATH_ALIAS_PREFIX))
                 .process("restResponseWrapper");
 
         from(OPERATION_CREATE_LINK)
