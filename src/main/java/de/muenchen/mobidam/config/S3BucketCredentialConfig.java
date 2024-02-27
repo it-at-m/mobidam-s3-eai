@@ -1,11 +1,10 @@
 package de.muenchen.mobidam.config;
 
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * This class represents the configuration for S3 bucket credentials.

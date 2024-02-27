@@ -5,14 +5,13 @@ import de.muenchen.mobidam.config.EnvironmentReader;
 import de.muenchen.mobidam.config.S3BucketCredentialConfig;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.MobidamException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.tooling.model.Strings;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * This class provides the credentials for S3 buckets.
