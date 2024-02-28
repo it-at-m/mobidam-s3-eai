@@ -3,6 +3,7 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import de.muenchen.mobidam.rest.PresignedUrl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,11 +24,14 @@ public class RestResponseWrapper implements Processor {
     @Override
     public void process(Exchange exchange) {
 
-        var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
+        var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
             filesInFile(exchange);
             break;
+        case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
+                presignedUrl(exchange);
+                break;
         default:
             exchange.getMessage().setBody(ErrorResponseBuilder.build(404, "REST ContextPath not found : " + contextPath));
         }
@@ -53,6 +57,19 @@ public class RestResponseWrapper implements Processor {
             files.add(content);
         });
         exchange.getMessage().setBody(files);
+    }
+
+    private void presignedUrl(Exchange exchange) {
+
+        var urls = new ArrayList<PresignedUrl>();
+        var links = exchange.getIn().getBody(Collection.class);
+
+        links.forEach(link -> {
+            var file = new PresignedUrl();
+            file.setUrl(link.toString());
+            urls.add(file);
+        });
+        exchange.getMessage().setBody(urls);
     }
 
 }

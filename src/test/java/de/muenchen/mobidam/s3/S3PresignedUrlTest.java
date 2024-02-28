@@ -8,12 +8,7 @@ import com.robothy.s3.rest.LocalS3;
 import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.rest.BucketContentInner;
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.List;
+import de.muenchen.mobidam.rest.PresignedUrl;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -34,6 +29,11 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -41,7 +41,7 @@ import software.amazon.awssdk.services.s3.model.*;
 )
 @EnableAutoConfiguration
 @DirtiesContext
-class S3PrefixTest {
+class S3PresignedUrlTest {
 
     @Produce()
     private ProducerTemplate producer;
@@ -60,7 +60,7 @@ class S3PrefixTest {
     private static S3Client s3InitClient;
 
     // Same as camel.component.aws2-s3.bucket
-    private static final String TEST_BUCKET = "test-bucket";
+    private static final String PRESIGNED_BUCKET = "presigned-bucket";
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -92,12 +92,7 @@ class S3PrefixTest {
         });
 
         // Create test bucket
-        s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
-                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/File_2.csv").build(),
-                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-
+        s3InitClient.createBucket(CreateBucketRequest.builder().bucket(PRESIGNED_BUCKET).build());
     }
 
     @AfterAll
@@ -106,49 +101,81 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixTest() {
+    public void test_RouteWithPresignedUrlTest() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(PRESIGNED_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .withHeader(Constants.OBJECT_NAME, "File_1.csv")
+                .withHeader(Constants.BUCKET_NAME, PRESIGNED_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(2, files.size());
-        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
-        Assertions.assertEquals("archive/File_2.csv", files.get(1).getKey());
-
-    }
-    
-    @Test
-    public void test_RouteWithCompletePrefixTest() {
-
-        var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, "archive")
-                .build();
-        var response = producer.send("{{camel.route.common}}", s3Request);
-
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("archive/File_2.csv", files.get(0).getKey());
+        var file = response.getIn().getBody(PresignedUrl.class);
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
 
     }
 
     @Test
-    public void test_RouteWithPrefixNoMatchTest() {
+    public void test_RouteWithPresignedUrlWithPrefixTest() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(PRESIGNED_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, "noMatch")
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .withHeader(Constants.OBJECT_NAME, "File_1.csv")
+                .withHeader(Constants.PATH_ALIAS_PREFIX, "prefix-test/")
+                .withHeader(Constants.BUCKET_NAME, PRESIGNED_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(0, files.size());
+        var file = response.getIn().getBody(PresignedUrl.class);
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/prefix-test/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+
+    }
+
+    @Test
+    public void test_RouteWithPresignedUrlObjectNotExistTest() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(PRESIGNED_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .withHeader(Constants.OBJECT_NAME, "FileNotExist.csv")
+                .withHeader(Constants.BUCKET_NAME, PRESIGNED_BUCKET)
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        var file = response.getIn().getBody(PresignedUrl.class);
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+
+    }
+
+    @Test
+    public void test_RouteWithPresignedUrlBucketNotExistTest() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(PRESIGNED_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .withHeader(Constants.OBJECT_NAME, "FileNotExist.csv")
+                .withHeader(Constants.BUCKET_NAME, "BucketNotExist")
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+
+        var file = response.getIn().getBody(PresignedUrl.class);
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/BucketNotExist/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+
     }
 
 }

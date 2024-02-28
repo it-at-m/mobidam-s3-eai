@@ -20,6 +20,12 @@ components:
             type: string
           size:
             type: number
+    PresignedUrl:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Download Url  
     ErrorResponse:
       type: object
       properties:
@@ -58,15 +64,50 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/BucketContent'
-        '4XX':
+        '400':
           description: Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '5XX':
+        '500':
           description: Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /presignedUrl:
+    get:
+      description: Retrieve download link
+      tags: 
+        - Files
+      operationId: viewObjectDownloadLink
+      parameters:
+      - name: bucketName
+        description: Bucket name
+        in: query
+        schema:
+          type: string
+          example: MyBucketName
+        required: true
+      - name: objectName
+        description: Object name
+        in: query
+        schema:
+          type: string
+          example: MyObjectName
+        required: true  
+      - name: path
+        description: S3 path/prefix
+        in: query
+        schema:
+          type: string
+          example: MyPathName
+        required: false 
+      responses:
+        '200':
+          description: Download url 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignedUrl'

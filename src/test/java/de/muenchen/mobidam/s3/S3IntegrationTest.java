@@ -70,7 +70,7 @@ class S3IntegrationTest {
 
         exchange = ExchangeBuilder.anExchange(camelContext).withHeader(AWS2S3Constants.KEY, object.getKey()).build();
 
-        bucketResponse = producer.send(S3RouteBuilder.OPERATION_CREATE_LINK, exchange);
+        bucketResponse = producer.send("{{camel.route.presignedUrl}}", exchange);
 
         var linkCollection = bucketResponse.getIn().getBody(Collection.class);
 

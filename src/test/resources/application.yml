@@ -33,3 +33,4 @@ mobidam:
   limit:
     search:
       items: 20
+    download: 30
