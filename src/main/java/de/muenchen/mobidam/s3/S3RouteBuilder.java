@@ -63,12 +63,16 @@ public class S3RouteBuilder extends RouteBuilder {
                 .process("s3OperationWrapper")
                 .log(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
                 .choice()
-                    .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
-                        .toD(String.format("aws2-s3://${header.%2$s}?S3Client=#s3Client&operation=${header.%1$s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION, Constants.BUCKET_NAME))
-                    .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
-                        .toD(String.format("aws2-s3://${header.%s}?accessKey={{camel.component.aws2-s3.access-key}}&secretKey={{camel.component.aws2-s3.secret-key}}&region={{camel.component.aws2-s3.region}}&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%s", Constants.BUCKET_NAME, AWS2S3Operations.createDownloadLink))
-                    .otherwise()
-                      .throwException(new MobidamException("REST ContextPath not found."))
+                .when()
+                .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
+                .toD(String.format("aws2-s3://${header.%2$s}?S3Client=#s3Client&operation=${header.%1$s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION,
+                        Constants.BUCKET_NAME))
+                .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
+                .toD(String.format(
+                        "aws2-s3://${header.%s}?accessKey={{camel.component.aws2-s3.access-key}}&secretKey={{camel.component.aws2-s3.secret-key}}&region={{camel.component.aws2-s3.region}}&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%s",
+                        Constants.BUCKET_NAME, AWS2S3Operations.createDownloadLink))
+                .otherwise()
+                .throwException(new MobidamException("REST ContextPath not found."))
                 .end()
                 .process("restResponseWrapper");
 

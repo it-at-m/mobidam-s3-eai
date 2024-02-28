@@ -120,7 +120,7 @@ class S3PrefixTest {
         Assertions.assertEquals("archive/File_2.csv", files.get(1).getKey());
 
     }
-    
+
     @Test
     public void test_RouteWithCompletePrefixTest() {
 

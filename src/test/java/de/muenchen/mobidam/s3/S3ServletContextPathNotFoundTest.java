@@ -40,7 +40,6 @@ class S3ServletContextPathNotFoundTest {
 
     private static final String TEST_BUCKET = "test-bucket";
 
-
     @Test
     public void test_RouteWithServletContextNotFoundTest() {
 

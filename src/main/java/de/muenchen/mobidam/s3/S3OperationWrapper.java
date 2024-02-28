@@ -57,7 +57,7 @@ public class S3OperationWrapper implements Processor {
                 throw new MobidamException("Bucket name is empty");
             }
 
-            if (objectKey == null )
+            if (objectKey == null)
                 break;
 
             var key = prefix != null ? prefix + objectKey : objectKey;

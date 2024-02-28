@@ -115,7 +115,8 @@ class S3PresignedUrlTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var file = response.getIn().getBody(PresignedUrl.class);
-        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
+                "Url not found: " + file.getUrl());
 
     }
 
@@ -135,7 +136,9 @@ class S3PresignedUrlTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var file = response.getIn().getBody(PresignedUrl.class);
-        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/prefix-test/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+        Assertions.assertTrue(
+                file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/prefix-test/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
+                "Url not found: " + file.getUrl());
 
     }
 
@@ -154,7 +157,8 @@ class S3PresignedUrlTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var file = response.getIn().getBody(PresignedUrl.class);
-        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/presigned-bucket/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
+                "Url not found: " + file.getUrl());
 
     }
 
@@ -172,9 +176,9 @@ class S3PresignedUrlTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-
         var file = response.getIn().getBody(PresignedUrl.class);
-        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/BucketNotExist/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="), "Url not found: " + file.getUrl());
+        Assertions.assertTrue(file.getUrl().startsWith("http://127.0.0.1:8080/BucketNotExist/FileNotExist.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
+                "Url not found: " + file.getUrl());
 
     }
 

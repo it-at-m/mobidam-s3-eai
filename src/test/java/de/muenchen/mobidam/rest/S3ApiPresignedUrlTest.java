@@ -72,6 +72,4 @@ class S3ApiPresignedUrlTest {
         Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
-
-
 }

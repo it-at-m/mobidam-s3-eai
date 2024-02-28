@@ -39,7 +39,7 @@ public class S3Api extends RouteBuilder {
                 .to("{{camel.route.common}}");
 
         /**
-         GET /presignedUrl
+         * GET /presignedUrl
          **/
         rest()
                 .get("/presignedUrl")
