@@ -12,4 +12,7 @@ public class Constants {
     public static final String PATH_ALIAS_PREFIX = "path";
     public static final String BUCKET_NAME = "bucketName";
 
+    // Headers for bucket credentials
+    public static final String ACCESS_KEY = "accessKey";
+    public static final String SECRET_KEY = "secretKey";
 }

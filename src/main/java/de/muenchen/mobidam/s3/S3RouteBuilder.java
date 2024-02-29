@@ -13,7 +13,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
-import org.apache.camel.component.aws2.s3.AWS2S3Operations;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -44,7 +44,7 @@ public class S3RouteBuilder extends RouteBuilder {
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
                         log.error("Error occurred in route", exception);
-                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getClass().getName());
+                        ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
                 });
@@ -53,14 +53,18 @@ public class S3RouteBuilder extends RouteBuilder {
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
-                .toD(String.format("aws2-s3://{{camel.component.aws2-s3.bucket}}?S3Client=#s3Client&operation=${header.%s}&pojoRequest=true",
-                        AWS2S3Constants.S3_OPERATION))
+                .process("s3CredentialProvider")
+                .toD(String.format(
+                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=${header.%s}",
+                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PATH_ALIAS_PREFIX))
                 .process("restResponseWrapper");
 
         from(OPERATION_CREATE_LINK)
                 .routeId("S3-Operation-CreateLink").routeDescription("Execute S3 Create Link Operation")
-                .toD("aws2-s3://{{camel.component.aws2-s3.bucket}}?accessKey={{camel.component.aws2-s3.access-key}}&secretKey={{camel.component.aws2-s3.secret-key}}&region={{camel.component.aws2-s3.region}}&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation="
-                        + AWS2S3Operations.createDownloadLink);
+                .to("log:de.muenchen.mobidam")
+        //                .toD(S"aws2-s3://${header.%s}?accessKey={{camel.component.aws2-s3.access-key}}&secretKey={{camel.component.aws2-s3.secret-key}}&region={{camel.component.aws2-s3.region}}&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation="
+        //                        + AWS2S3Operations.createDownloadLink)
+        ;
 
     }
 
