@@ -27,7 +27,7 @@
 
 Gesamtziel des Projektes MobidaM ist die Einführung einer Mobilitätsdatenplattform zur Bereitstellung, Haltung, Visualisierung und Auswertung von Mobilitätsdaten im Kontext der Mobilitätsplanung, der Wirkungsanalyse und der Angebotssteuerung. Hierbei werden die unterschiedlichsten Daten aus verschiedenen internen oder externen Datenquellen benötigt. 
 
-Im Kontext des MobidaM Projekts implementiert die S3-EAI die Anbindung des stadteigenen S3-Hosts um Daten aus den angeschlossenen Schnittstellen in MobodaM importieren zu können. 
+Im Kontext des MobidaM Projekts implementiert die S3-EAI die Anbindung des stadteigenen S3-Hosts um Daten aus den angeschlossenen Schnittstellen in MobidaM importieren zu können. 
 
 <p align="right">(<a href="#top">nach oben</a>)</p>
 
@@ -43,7 +43,7 @@ Dieses Projekt verwendet die folgenden Technologien:
 
 ## Set up
 
-TBD: _how can i start and fly this project_
+siehe <a href="https://github.com/it-at-m/mobidam-s3-eai/tree/main/docs">docs</a>
 
 <p align="right">(<a href="#top">nach oben</a>)</p>
 
@@ -52,7 +52,7 @@ TBD: _how can i start and fly this project_
 
 <!--*what insights do you have to tell*-->
 
-Die Dokumentation befindet sich unter <a href="https://github.com/it-at-m/mobidam-s3-eai/tree/dev/docs">docs</a>
+Die Dokumentation befindet sich unter <a href="https://github.com/it-at-m/mobidam-s3-eai/tree/main/docs">docs</a>
 
 <p align="right">(<a href="#top">nach oben</a>)</p>
 
