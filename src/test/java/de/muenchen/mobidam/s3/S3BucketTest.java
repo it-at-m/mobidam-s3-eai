@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -37,7 +39,15 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+        properties = {
+                "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder,"
+        }
+)
+@TestPropertySource(
+        properties = {
+                "FOO_ACCESS_KEY=foo",
+                "FOO_SECRET_KEY=bar"
+        }
 )
 @EnableAutoConfiguration
 @DirtiesContext
@@ -53,7 +63,6 @@ class S3BucketTest {
 
     private static S3Client s3InitClient;
 
-    // Same as camel.component.aws2-s3.bucket
     private static final String TEST_BUCKET = "test-bucket";
 
     @BeforeAll
@@ -103,8 +112,8 @@ class S3BucketTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Bucket name is empty", error.getError());
-        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
+        Assertions.assertEquals("Bucket name is missing", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
 
     @Test
@@ -117,8 +126,8 @@ class S3BucketTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertTrue(error.getError().startsWith("software.amazon.awssdk.services.s3.model.NoSuchBucketException"));
-        Assertions.assertEquals(BigDecimal.valueOf(404), error.getStatus());
+        Assertions.assertEquals("Configuration for bucket not found: foo", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), error.getStatus());
 
     }
 
@@ -132,8 +141,8 @@ class S3BucketTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Bucket name is empty", error.getError());
-        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
+        Assertions.assertEquals("Bucket name is missing", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
 
     @Test
@@ -146,8 +155,8 @@ class S3BucketTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Bucket name is empty", error.getError());
-        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
+        Assertions.assertEquals("Bucket name is missing", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
 
 }

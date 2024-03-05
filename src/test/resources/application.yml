@@ -21,8 +21,6 @@ camel:
       context-path: /api/*
   component:
     aws2-s3:
-      access-key: foo
-      secret-key: foo
       override-endpoint: http://127.0.0.1:8080
       bucket: test-bucket
       region: local
@@ -34,3 +32,8 @@ mobidam:
     search:
       items: 20
     download: 30
+  s3:
+    bucket-credential-config:
+      test-bucket:
+        access-key-env-var: FOO_ACCESS_KEY
+        secret-key-env-var: FOO_SECRET_KEY

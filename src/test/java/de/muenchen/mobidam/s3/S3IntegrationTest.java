@@ -34,21 +34,20 @@ class S3IntegrationTest {
     @Produce()
     private ProducerTemplate producer;
 
-    @Value("${camel.component.aws2-s3.bucket}")
-    private String bucket;
-
     @Value("${camel.component.aws2-s3.override-endpoint}")
     private String s3url;
 
     @Autowired
     private CamelContext camelContext;
 
+    private static final String TEST_BUCKET = "test-bucket";
+
     @Test
     void s3BucketObjectsListTest() {
 
-        var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
+        var s3RequestObjects = ListObjectsRequest.builder().bucket(TEST_BUCKET).build();
         var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
-                .withHeader("bucketName", bucket).build();
+                .withHeader("bucketName", TEST_BUCKET).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send("{{camel.route.common}}", exchange);
         var objects = bucketResponse.getIn().getBody(ArrayList.class);
@@ -59,9 +58,9 @@ class S3IntegrationTest {
     @Test
     void s3PresignedObjectUrlTest() {
 
-        var s3RequestObjects = ListObjectsRequest.builder().bucket(bucket).build();
+        var s3RequestObjects = ListObjectsRequest.builder().bucket(TEST_BUCKET).build();
         var exchange = ExchangeBuilder.anExchange(camelContext).withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "filesInFolder")
-                .withHeader("bucketName", bucket).build();
+                .withHeader("bucketName", TEST_BUCKET).build();
         exchange.getIn().setBody(s3RequestObjects);
         var bucketResponse = producer.send("{{camel.route.common}}", exchange);
         var objectsCollection = bucketResponse.getIn().getBody(Collection.class);
@@ -75,7 +74,7 @@ class S3IntegrationTest {
         var linkCollection = bucketResponse.getIn().getBody(Collection.class);
 
         var link = (String) linkCollection.iterator().next();
-        var compare = String.format("https://%s.%s/Test.csv", bucket, s3url.substring(s3url.indexOf("//") + 2));
+        var compare = String.format("https://%s.%s/Test.csv", TEST_BUCKET, s3url.substring(s3url.indexOf("//") + 2));
         Assertions.assertTrue(link.contains(compare), "Url not found: " + compare);
 
     }

@@ -15,4 +15,7 @@ public class Constants {
     public static final String BUCKET_NAME = "bucketName";
     public static final String OBJECT_NAME = "objectName";
 
+    // Headers for bucket credentials
+    public static final String ACCESS_KEY = "accessKey";
+    public static final String SECRET_KEY = "secretKey";
 }

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -33,7 +34,7 @@ public class RestResponseWrapper implements Processor {
             presignedUrl(exchange);
             break;
         default:
-            exchange.getMessage().setBody(ErrorResponseBuilder.build(404, "REST ContextPath not found : " + contextPath));
+            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
         }
 
     }

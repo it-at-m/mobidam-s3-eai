@@ -16,6 +16,7 @@ import org.apache.camel.ResolveEndpointFailedException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -52,7 +53,7 @@ public class S3RouteBuilder extends RouteBuilder {
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
                         log.error("Error occurred in route", exception);
-                        ErrorResponse res = ErrorResponseBuilder.build(500, exception.getClass().getName());
+                        ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
                 });
@@ -61,16 +62,17 @@ public class S3RouteBuilder extends RouteBuilder {
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
                 .process("s3OperationWrapper")
-                .log(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
+                .log(String.format("CamelServletContextPath: ${header.%s}", Constants.CAMEL_SERVLET_CONTEXT_PATH))
+                .process("s3CredentialProvider")
                 .choice()
-                .when()
-                .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
-                .toD(String.format("aws2-s3://${header.%2$s}?S3Client=#s3Client&operation=${header.%1$s}&pojoRequest=true", AWS2S3Constants.S3_OPERATION,
-                        Constants.BUCKET_NAME))
-                .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
-                .toD(String.format(
-                        "aws2-s3://${header.%s}?accessKey={{camel.component.aws2-s3.access-key}}&secretKey={{camel.component.aws2-s3.secret-key}}&region={{camel.component.aws2-s3.region}}&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%s",
-                        Constants.BUCKET_NAME, AWS2S3Operations.createDownloadLink))
+                    .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
+                        .toD(String.format(
+                                "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=${header.%s}",
+                                Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PATH_ALIAS_PREFIX))
+                    .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
+                        .toD(String.format(
+                            "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%s",
+                            Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
                 .otherwise()
                 .throwException(new MobidamException("REST ContextPath not found."))
                 .end()
