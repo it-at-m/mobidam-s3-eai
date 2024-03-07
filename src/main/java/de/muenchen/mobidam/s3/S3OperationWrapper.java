@@ -4,6 +4,7 @@ import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.MobidamException;
 import de.muenchen.mobidam.rest.ErrorResponse;
+import java.time.Duration;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -14,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-
-import java.time.Duration;
 
 @Component
 public class S3OperationWrapper implements Processor {
