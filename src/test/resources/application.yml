@@ -22,7 +22,6 @@ camel:
   component:
     aws2-s3:
       override-endpoint: http://127.0.0.1:8080
-      bucket: test-bucket
       region: local
   route:
     common: direct:commonOperations
@@ -31,7 +30,8 @@ mobidam:
   limit:
     search:
       items: 20
-    download: 30
+  download:
+    expiration: 30
   s3:
     bucket-credential-config:
       test-bucket:

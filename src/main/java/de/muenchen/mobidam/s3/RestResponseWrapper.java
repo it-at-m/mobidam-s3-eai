@@ -62,15 +62,15 @@ public class RestResponseWrapper implements Processor {
 
     private void presignedUrl(Exchange exchange) {
 
-        var urls = new ArrayList<PresignedUrl>();
         var links = exchange.getIn().getBody(Collection.class);
 
-        links.forEach(link -> {
+        if (links.isEmpty()) {
+            exchange.getMessage().setBody(new PresignedUrl());
+        } else {
             var file = new PresignedUrl();
-            file.setUrl(link.toString());
-            urls.add(file);
-        });
-        exchange.getMessage().setBody(urls);
+            file.setUrl(links.iterator().next().toString());
+            exchange.getMessage().setBody(file);
+        }
     }
 
 }

@@ -15,7 +15,6 @@ import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -31,9 +30,6 @@ class S3ServletContextPathNotFoundTest {
 
     @Produce()
     private ProducerTemplate producer;
-
-    @Value("${camel.component.aws2-s3.bucket}")
-    private String bucket;
 
     @Autowired
     private CamelContext camelContext;
