@@ -19,8 +19,8 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @Component
 public class S3OperationWrapper implements Processor {
 
-    @Value("${mobidam.limit.download:30}")
-    private int downloadLimit; // The URL will expire in downloadLimit minutes.
+    @Value("${mobidam.download.expiration:30}")
+    private int downloadExpiration;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -37,7 +37,7 @@ public class S3OperationWrapper implements Processor {
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
 
-            var objectKey = exchange.getIn().getHeader(Constants.OBJECT_NAME, String.class);
+            var objectName = exchange.getIn().getHeader(Constants.OBJECT_NAME, String.class);
 
             if (Strings.isNullOrEmpty(bucketName)) {
                 ErrorResponse res = ErrorResponseBuilder.build(400, "Bucket name is empty");
@@ -45,13 +45,17 @@ public class S3OperationWrapper implements Processor {
                 throw new MobidamException("Bucket name is empty");
             }
 
-            if (objectKey == null)
-                break;
+            if (objectName == null) {
+                ErrorResponse res = ErrorResponseBuilder.build(400, "Object name is empty");
+                exchange.getMessage().setBody(res);
+                throw new MobidamException("Object name is empty");
+            }
 
-            var key = prefix != null ? prefix + objectKey : objectKey;
+            var key = prefix != null ? prefix + objectName : objectName;
+
             var objectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
 
-            var presignRequest = GetObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(downloadLimit))
+            var presignRequest = GetObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(downloadExpiration))
                     .getObjectRequest(objectRequest)
                     .build();
 

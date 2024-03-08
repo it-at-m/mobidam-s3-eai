@@ -8,7 +8,6 @@ camel:
   component:
     aws2-s3:
       override-endpoint: ...
-      bucket: ...
       region: ...
   route:
     common: direct:commonOperations
@@ -17,7 +16,8 @@ mobidam:
   limit:
     search:
       items: 20
-    download: 30
+  download:
+    expiration: 30
   s3:
     bucket-credential-config:
       x-itmkm82k:
