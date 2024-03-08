@@ -6,7 +6,7 @@ on:
       - 'sprint'
 
 jobs:
-  backend-build-and-docker-push:
+  build-and-docker-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
