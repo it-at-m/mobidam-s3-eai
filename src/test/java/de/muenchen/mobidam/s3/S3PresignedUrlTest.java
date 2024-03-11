@@ -184,4 +184,33 @@ class S3PresignedUrlTest {
 
     }
 
+    @Test
+    public void test_RouteWithPresignedUrlObjectNameNullError() {
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .withHeader(Constants.BUCKET_NAME, "BucketNotExist")
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        var error = response.getIn().getBody(ErrorResponse.class);
+        Assertions.assertEquals("Object name is empty", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
+
+    }
+
+    @Test
+    public void test_RouteWithPresignedUrlBucketAndObjectNameNullError() {
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        var error = response.getIn().getBody(ErrorResponse.class);
+        Assertions.assertEquals("Bucket name is empty", error.getError());
+        Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
+
+    }
+
 }
