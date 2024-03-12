@@ -67,4 +67,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/it-at-m/mobidam:mobidam-s3-eai-demo
+          tags: ghcr.io/it-at-m/mobidam-s3-eai:demo
