@@ -48,12 +48,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_KEY }}
 
-      - name: Build and push app
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: # TODO
+          tags: ghcr.io/it-at-m/mobidam:mobidam-s3-eai-${{ steps.set-version.outputs.new_version }}, ghcr.io/it-at-m/mobidam:mobidam-s3-eai-demo
 
   github-release:
     needs: release
