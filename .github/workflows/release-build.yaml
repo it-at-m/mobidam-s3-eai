@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Git checkout to main branch # Releases are published on main branch
         uses: actions/checkout@v4
-        # with: { ref: main }
+        with: { ref: main }
 
       - name: Install Java and Maven
         uses: actions/setup-java@v3
@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Git checkout to main branch # Releases are published on main branch
         uses: actions/checkout@v4
-        # with: { ref: main }
+        with: { ref: main }
 
       - name: Get New Project Version
         id: get-version
@@ -91,7 +91,7 @@ jobs:
     steps:
       - name: Git checkout to sprint branch # Snapshots are published on sprint branch
         uses: actions/checkout@v4
-        # with: { ref: sprint }
+        with: { ref: sprint }
 
       - name: Set Maven Project Version
         id: set-version

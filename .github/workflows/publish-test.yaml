@@ -1,7 +1,6 @@
 name: Build and publish to test
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - 'sprint'
