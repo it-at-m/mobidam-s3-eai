@@ -26,7 +26,7 @@ import org.springframework.test.context.TestPropertySource;
 @EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = { "camel.route.common=mock:common" })
-class S3ApiTest {
+class S3ApiPresignedUrlTest {
 
     @Produce("http:127.0.0.1:8081/api")
     private ProducerTemplate producer;
@@ -35,53 +35,41 @@ class S3ApiTest {
     private MockEndpoint commonRoute;
 
     @Test
-    public void test_RouteWithBucketNameHeaderNotExistTest() throws InterruptedException {
-
-        commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder", null);
-        commonRoute.assertIsSatisfied();
-
-        var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
-    }
-
-    @Test
     public void test_RouteWithBucketNameHeaderEmptyTest() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=", null);
+        producer.sendBody("http:127.0.0.1:8081/api/presignedUrl?bucketName=", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
+        Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
     @Test
     public void test_RouteWithBucketNameHeaderExistTest() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST", null);
+        producer.sendBody("http:127.0.0.1:8081/api/presignedUrl?bucketName=TEST", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
-        Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
+        Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
     @Test
     public void test_RouteWithPathHeaderExistTest() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&path=FOO", null);
+        producer.sendBody("http:127.0.0.1:8081/api/presignedUrl?bucketName=TEST&path=FOO", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
         Assertions.assertEquals("FOO", exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
-        Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
+        Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
 }
