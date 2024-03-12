@@ -16,11 +16,11 @@ public class S3Api extends RouteBuilder {
     public void configure() throws Exception {
 
         /**
-         * GET /filesInFolder
+         GET /filesInFolder : Get S3 bucket object list
          **/
         rest()
                 .get("/filesInFolder")
-                .description("")
+                .description("Get S3 bucket object list")
                 .id("filesInFolderGetApi")
                 .produces("application/json")
                 .outType(BucketContentInner[].class)
@@ -39,11 +39,11 @@ public class S3Api extends RouteBuilder {
                 .to("{{camel.route.common}}");
 
         /**
-         * GET /presignedUrl
+         GET /presignedUrl : Retrieve download link
          **/
         rest()
                 .get("/presignedUrl")
-                .description("")
+                .description("Retrieve download link")
                 .id("viewObjectDownloadLink")
                 .produces("application/json")
                 .outType(PresignedUrl.class)
@@ -59,11 +59,28 @@ public class S3Api extends RouteBuilder {
                 .required(true)
                 .description("Object name")
                 .endParam()
+                .to("{{camel.route.common}}");
+
+        /**
+         PUT /archive : Move &#39;finshed&#39; file to archive.
+         **/
+        rest()
+                .put("/archive")
+                .description("Move 'finished' file to archive.")
+                .id("moveFinishedFileToArchiveApi")
+                .produces("application/json")
+                .outType(Void.class)
                 .param()
-                .name("path")
+                .name("bucketName")
                 .type(RestParamType.query)
-                .required(false)
-                .description("S3 path/prefix")
+                .required(true)
+                .description("Bucket name")
+                .endParam()
+                .param()
+                .name("objectName")
+                .type(RestParamType.query)
+                .required(true)
+                .description("Object name")
                 .endParam()
                 .to("{{camel.route.common}}");
 
