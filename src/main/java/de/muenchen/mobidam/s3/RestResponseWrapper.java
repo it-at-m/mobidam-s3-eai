@@ -2,7 +2,10 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.exception.MobidamException;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import de.muenchen.mobidam.rest.ErrorResponse;
+import de.muenchen.mobidam.rest.PresignedUrl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,12 +25,15 @@ public class RestResponseWrapper implements Processor {
     private int maxS3ObjectItems;
 
     @Override
-    public void process(Exchange exchange) {
+    public void process(Exchange exchange) throws MobidamException {
 
-        var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).replace("/", "");
+        var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
             filesInFile(exchange);
+            break;
+        case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
+            presignedUrl(exchange);
             break;
         default:
             exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
@@ -54,6 +60,21 @@ public class RestResponseWrapper implements Processor {
             files.add(content);
         });
         exchange.getMessage().setBody(files);
+    }
+
+    private void presignedUrl(Exchange exchange) throws MobidamException {
+
+        var links = exchange.getIn().getBody(Collection.class);
+
+        if (links.isEmpty()) {
+            ErrorResponse res = ErrorResponseBuilder.build(500, "Empty S3 url file list");
+            exchange.getMessage().setBody(res);
+            throw new MobidamException("Empty S3 url file list");
+        } else {
+            var file = new PresignedUrl();
+            file.setUrl(links.iterator().next().toString());
+            exchange.getMessage().setBody(file);
+        }
     }
 
 }

@@ -38,5 +38,34 @@ public class S3Api extends RouteBuilder {
                 .endParam()
                 .to("{{camel.route.common}}");
 
+        /**
+         * GET /presignedUrl
+         **/
+        rest()
+                .get("/presignedUrl")
+                .description("")
+                .id("viewObjectDownloadLink")
+                .produces("application/json")
+                .outType(PresignedUrl.class)
+                .param()
+                .name("bucketName")
+                .type(RestParamType.query)
+                .required(true)
+                .description("Bucket name")
+                .endParam()
+                .param()
+                .name("objectName")
+                .type(RestParamType.query)
+                .required(true)
+                .description("Object name")
+                .endParam()
+                .param()
+                .name("path")
+                .type(RestParamType.query)
+                .required(false)
+                .description("S3 path/prefix")
+                .endParam()
+                .to("{{camel.route.common}}");
+
     }
 }

@@ -30,6 +30,8 @@ mobidam:
   limit:
     search:
       items: 20
+  download:
+    expiration: 30
   s3:
     bucket-credential-config:
       test-bucket:

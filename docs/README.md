@@ -17,15 +17,13 @@ Die Enterprise Application Integration Komponente (EAI) bietet eine Webschnittst
 
 Github-Repo:  https://github.com/it-at-m/mobidam-s3-eai
 
-
-## Technisches Setup
-
-### Openapi
-Um neue Openapi Java Source Dateien zu erstellen kann das Maven Profil _generate-openapi_ verwendet werden.
+# Technisches Setup
+## Openapi
+Um neue Openapi Java Source Dateien zu erstellen kann das Maven Profil _generate-openapi_ verwendet werden (mvn clean compile -P generate-openapi).
 Das Profil erzeugt die Openapi Java Source Dateien im Maven _target_ Ordner.
 Änderungen und neue Features können in die Klassen im Package _de.muenchen.mobidam.rest_ kopiert werden.
 
-Die Openapi Quelle man mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
+Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
 
 ### Konfiguration
 
@@ -46,3 +44,4 @@ MOBIDAM_BUCKET1_SECRET_KEY=<my-secret-key1>
 MOBIDAM_BUCKET2_ACCESS_KEY=<my-access-key2>
 MOBIDAM_BUCKET2_SECRET_KEY=<my-secret-key2>
 ```
+
