@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Git checkout to main branch # Releases are published on main branch
         uses: actions/checkout@v4
-        with: { ref: main }
+        # with: { ref: main }
 
       - name: Install Java and Maven
         uses: actions/setup-java@v3

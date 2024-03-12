@@ -38,7 +38,7 @@ jobs:
 
       - name: Git checkout to main branch # the workflow is triggered in the default branch, which doesn't have to be MAIN
         uses: actions/checkout@v4
-        with: { ref: main } # this also serves as a safeguard for workflows triggered manually
+        # with: { ref: main } # this also serves as a safeguard for workflows triggered manually
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
