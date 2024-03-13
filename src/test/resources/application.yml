@@ -9,6 +9,31 @@ management:
 spring:
   profiles:
     active: default
+    # Spring JPA
+    h2.console.enabled: true
+    datasource:
+    jpa:
+      database: H2
+      hibernate:
+        # always drop and create the db should be the best
+        # configuration for local (development) mode. this
+        # is also the default, that spring offers by convention.
+        # but here explicite:
+        ddl-auto: none
+        naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      # Logging for database operation
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+          connection:
+            url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS mdass3eai
+            driver_class: org.h2.Driver
+      defer-datasource-initialization: true
+      database-platform: org.hibernate.dialect.H2Dialect
+    sql:
+      init:
+        mode: never
 
 server:
   port: 8081

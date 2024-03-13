@@ -30,6 +30,25 @@ mobidam:
 spring:
   application:
     name: @project.artifactId@
+  datasource:
+    url: ...
+    username: ...
+    password: ...
+    driver-class-name: ...
+  jpa:
+    hibernate:
+      # always drop and create the db should be the best
+      # configuration for local (development) mode. this
+      # is also the default, that spring offers by convention.
+      # but here explicite:
+      ddl-auto: create-drop
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    # Logging for database operation
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: ...
 
 # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
 management:
