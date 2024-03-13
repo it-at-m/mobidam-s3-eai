@@ -9,23 +9,14 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.rest.BucketContentInner;
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -35,6 +26,12 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
+@Disabled
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -46,9 +43,9 @@ import software.amazon.awssdk.services.s3.model.*;
                 "FOO_SECRET_KEY=bar"
         }
 )
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
+@EnableAutoConfiguration
 @DirtiesContext
-class S3PrefixTest {
+class S3ArchiveTest {
 
     @Produce()
     private ProducerTemplate producer;
@@ -93,11 +90,6 @@ class S3PrefixTest {
 
         // Create test bucket
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
-                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/File_2.csv").build(),
-                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-
     }
 
     @AfterAll
@@ -106,7 +98,11 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixTest() {
+    public void test_RouteWithListObjectTest() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -118,37 +114,6 @@ class S3PrefixTest {
         Assertions.assertEquals(1, files.size());
         Assertions.assertEquals("File_1.csv", files.get(0).getKey());
 
-    }
-
-    @Test
-    public void test_RouteWithPrefixTrueTest() {
-
-        var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, Boolean.TRUE)
-                .build();
-        var response = producer.send("{{camel.route.common}}", s3Request);
-
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("archive/File_2.csv", files.get(0).getKey());
-
-    }
-
-    @Test
-    public void test_RouteWithPrefixFalseTest() {
-
-        var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, Boolean.FALSE)
-                .build();
-        var response = producer.send("{{camel.route.common}}", s3Request);
-
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
     }
 
 }

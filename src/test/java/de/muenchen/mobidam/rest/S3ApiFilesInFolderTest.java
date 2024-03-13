@@ -76,12 +76,12 @@ class S3ApiFilesInFolderTest {
     public void test_RouteWithPathHeaderExistTest() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&path=FOO", null);
+        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&path=true", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("FOO", exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
+        Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 

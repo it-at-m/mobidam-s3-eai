@@ -22,17 +22,25 @@ public class S3OperationWrapper implements Processor {
     @Value("${mobidam.download.expiration:30}")
     private int downloadExpiration;
 
+    @Value("${mobidam.archive.name:archive}")
+    private String archive;
+
+    @Value("${mobidam.archive.delimiter:/}")
+    private String delimiter;
+
     @Override
     public void process(Exchange exchange) throws Exception {
 
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
 
-        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, String.class);
+        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) != null ? exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) : false ;
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
             exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
+            var bucketOrBucketArchive = prefix ? Constants.S3_PREFIX + archive : Constants.S3_DELIMITER + delimiter;
+            exchange.getIn().setHeader(Constants.PATH_ALIAS_PREFIX, bucketOrBucketArchive);
             break;
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
@@ -51,7 +59,7 @@ public class S3OperationWrapper implements Processor {
                 throw new MobidamException("Object name is empty");
             }
 
-            var key = prefix != null ? prefix + objectName : objectName;
+            var key = prefix ? archive + delimiter + objectName : objectName;
 
             var objectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
 

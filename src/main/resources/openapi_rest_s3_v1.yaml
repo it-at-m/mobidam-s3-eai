@@ -56,8 +56,8 @@ paths:
           description: S3 path
           in: query
           schema:
-            type: string
-            example: MyPathName
+            type: boolean
+            example: true or false
           required: false
       responses:
         '200':

@@ -68,7 +68,7 @@ public class S3RouteBuilder extends RouteBuilder {
                 .when()
                 .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
                 .toD(String.format(
-                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=${header.%s}",
+                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&${header.%s}",
                         Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PATH_ALIAS_PREFIX))
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
                 .toD(String.format(

@@ -133,14 +133,14 @@ class S3PresignedUrlTest {
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
                 .withHeader(Constants.OBJECT_NAME, "File_1.csv")
-                .withHeader(Constants.PATH_ALIAS_PREFIX, "prefix-test/")
+                .withHeader(Constants.PATH_ALIAS_PREFIX, Boolean.TRUE)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var file = response.getIn().getBody(PresignedUrl.class);
         Assertions.assertTrue(
-                file.getUrl().startsWith("http://127.0.0.1:8080/test-bucket/prefix-test/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
+                file.getUrl().startsWith("http://127.0.0.1:8080/test-bucket/archive/File_1.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date="),
                 "Url not found: " + file.getUrl());
 
     }

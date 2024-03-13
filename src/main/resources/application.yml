@@ -13,6 +13,9 @@ camel:
     common: direct:commonOperations
 
 mobidam:
+  archive:
+    name: archive
+    delimiter: /
   limit:
     search:
       items: 20

@@ -12,9 +12,12 @@ public class Constants {
     public static final String CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL = "/presignedUrl";
     public static final String CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE_URL = "/archive";
     public static final String PATH_ALIAS_PREFIX = "path";
-
     public static final String BUCKET_NAME = "bucketName";
     public static final String OBJECT_NAME = "objectName";
+
+    // S3 url parameter
+    public static final String S3_PREFIX = "prefix=";
+    public static final String S3_DELIMITER = "delimiter=";
 
     // Headers for bucket credentials
     public static final String ACCESS_KEY = "accessKey";
