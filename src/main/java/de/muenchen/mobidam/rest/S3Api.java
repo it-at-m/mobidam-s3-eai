@@ -68,8 +68,6 @@ public class S3Api extends RouteBuilder {
                 .put("/archive")
                 .description("Move 'finished' file to archive.")
                 .id("moveFinishedFileToArchiveApi")
-                .produces("application/json")
-                .outType(Void.class)
                 .param()
                 .name("bucketName")
                 .type(RestParamType.query)

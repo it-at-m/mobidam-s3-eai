@@ -26,19 +26,6 @@ components:
         url:
           type: string
           description: Download Url
-    MobidamArchive:
-      type: object
-      properties:
-        id:
-          type: string
-        bucket:
-          type: string
-        path:
-          type: string
-        date:
-          type: string
-        expiration:
-          type: string
     ErrorResponse:
       type: object
       properties:
@@ -65,7 +52,7 @@ paths:
             type: string
             example: MyBucketName
           required: true
-        - name: archived
+        - name: archive
           description: Move file to bucket 'archive'
           in: query
           schema:
@@ -155,12 +142,8 @@ paths:
             example: MyObjectName
           required: true
       responses:
-        '200':
+        '204':
           description: File is moved to archive
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MobidamArchive'
         4XX:
           description: Error
           content:
