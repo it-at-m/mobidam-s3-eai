@@ -26,6 +26,19 @@ components:
         url:
           type: string
           description: Download Url
+    MobidamArchive:
+      type: object
+      properties:
+        id:
+          type: string
+        bucket:
+          type: string
+        path:
+          type: string
+        date:
+          type: string
+        expiration:
+          type: string
     ErrorResponse:
       type: object
       properties:
@@ -40,7 +53,7 @@ paths:
   /filesInFolder:
     get:
       tags:
-        - S3
+        - Bucket
       operationId: viewFilesInFolder
       summary: Get S3 bucket object list
       description: "Each department has its own S3 bucket."
@@ -121,6 +134,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /archive:
     put:
+      tags: 
+        - Files
       summary: Move 'processed' file to archive.
       description: "'archive' is tenant wide constant for all buckets"
       operationId: moveFinishedFileToArchive
@@ -142,6 +157,10 @@ paths:
       responses:
         '200':
           description: File is moved to archive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobidamArchive'
         4XX:
           description: Error
           content:

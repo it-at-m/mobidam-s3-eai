@@ -16,6 +16,7 @@ mobidam:
   archive:
     name: archive
     delimiter: /
+    expiration-month: 1
   limit:
     search:
       items: 20
@@ -44,7 +45,7 @@ spring:
       # configuration for local (development) mode. this
       # is also the default, that spring offers by convention.
       # but here explicite:
-      ddl-auto: create-drop
+      ddl-auto: none
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     # Logging for database operation
     show-sql: true

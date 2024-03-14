@@ -5,11 +5,9 @@
 package de.muenchen.mobidam.domain;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.util.UUID;
-
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 /**
@@ -20,13 +18,13 @@ import lombok.*;
  */
 // Definition of getter, setter, ...
 @Entity
-@Table(name="Archive", schema = "mdass3eai")
+@Table(name = "Archive", schema = "mdass3eai")
 @Getter
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Archive extends BaseEntity {
+public class MobidamArchive extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,6 +34,9 @@ public class Archive extends BaseEntity {
 
     @Column(nullable = false)
     @NotEmpty
+    private String bucket;
+    @Column(nullable = false)
+    @NotEmpty
     private String path;
     @Column(nullable = false)
     @NotEmpty
@@ -43,11 +44,5 @@ public class Archive extends BaseEntity {
     @Column(nullable = false)
     @NotEmpty
     private LocalDate expiration;
-    @Column(nullable = false)
-    @NotEmpty
-    private String tenant;
-    @Column(nullable = false)
-    @NotEmpty
-    private String bucket;
 
 }

@@ -1,10 +1,12 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.MobidamException;
 import de.muenchen.mobidam.rest.ErrorResponse;
 import java.time.Duration;
+import java.time.LocalDate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -22,6 +24,9 @@ public class S3OperationWrapper implements Processor {
     @Value("${mobidam.download.expiration:30}")
     private int downloadExpiration;
 
+    @Value("${mobidam.archive.expiration-month:1}")
+    private int archiveExpiration;
+
     @Value("${mobidam.archive.name:archive}")
     private String archive;
 
@@ -34,7 +39,9 @@ public class S3OperationWrapper implements Processor {
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
 
-        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) != null ? exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) : false ;
+        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) != null
+                ? exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class)
+                : false;
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
@@ -69,6 +76,22 @@ public class S3OperationWrapper implements Processor {
 
             exchange.getIn().setHeader(AWS2S3Constants.KEY, key);
             exchange.getIn().setBody(presignRequest);
+            break;
+
+        case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
+
+            objectName = exchange.getIn().getHeader(Constants.OBJECT_NAME, String.class);
+
+            exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
+            exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
+            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, archive + delimiter + objectName);
+
+            var archiveNotice = new MobidamArchive();
+            archiveNotice.setBucket(bucketName);
+            archiveNotice.setPath(exchange.getIn().getHeader(AWS2S3Constants.DESTINATION_KEY, String.class));
+            archiveNotice.setDate(LocalDate.now());
+            archiveNotice.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
+            exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveNotice);
 
             break;
 

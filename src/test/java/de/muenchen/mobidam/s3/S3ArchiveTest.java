@@ -8,14 +8,23 @@ import com.robothy.s3.rest.LocalS3;
 import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.rest.BucketContentInner;
+import de.muenchen.mobidam.repository.ArchiveRepository;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -26,12 +35,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.List;
-@Disabled
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -53,11 +56,25 @@ class S3ArchiveTest {
     @Autowired
     private CamelContext camelContext;
 
+    @Autowired()
+    private ArchiveRepository archiveRepository;
+
     private static LocalS3 localS3;
 
     private static S3Client s3InitClient;
 
     private static final String TEST_BUCKET = "test-bucket";
+
+    private static final String OBJECT_KEY = "File_1.csv";
+
+    @Value("${mobidam.archive.name:archive}")
+    private String archive;
+
+    @Value("${mobidam.archive.delimiter:/}")
+    private String delimiter;
+
+    @Value("${mobidam.archive.expiration-month:/}")
+    private int expiration;
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -98,21 +115,30 @@ class S3ArchiveTest {
     }
 
     @Test
-    public void test_RouteWithListObjectTest() {
+    public void test_RouteWithArchiveTest() {
 
         // Set S3 test-bucket content
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(OBJECT_KEY).build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
-                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.OBJECT_NAME, OBJECT_KEY)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
+        var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
+
+        Assertions.assertEquals(1, bucketContent.contents().size());
+        Assertions.assertEquals(archive + delimiter + OBJECT_KEY, bucketContent.contents().get(0).key());
+
+        var dbContent = archiveRepository.findAll();
+        Assertions.assertEquals(1, dbContent.size());
+        Assertions.assertEquals(archive + delimiter + OBJECT_KEY, dbContent.get(0).getPath());
+        Assertions.assertEquals(TEST_BUCKET, dbContent.get(0).getBucket());
+        Assertions.assertEquals(LocalDate.now(), dbContent.get(0).getDate());
+        Assertions.assertEquals(LocalDate.now().plusMonths(expiration), dbContent.get(0).getExpiration());
 
     }
 

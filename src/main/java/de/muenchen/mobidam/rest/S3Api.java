@@ -16,7 +16,7 @@ public class S3Api extends RouteBuilder {
     public void configure() throws Exception {
 
         /**
-         GET /filesInFolder : Get S3 bucket object list
+         * GET /filesInFolder : Get S3 bucket object list
          **/
         rest()
                 .get("/filesInFolder")
@@ -39,7 +39,7 @@ public class S3Api extends RouteBuilder {
                 .to("{{camel.route.common}}");
 
         /**
-         GET /presignedUrl : Retrieve download link
+         * GET /presignedUrl : Retrieve download link
          **/
         rest()
                 .get("/presignedUrl")
@@ -62,7 +62,7 @@ public class S3Api extends RouteBuilder {
                 .to("{{camel.route.common}}");
 
         /**
-         PUT /archive : Move &#39;finshed&#39; file to archive.
+         * PUT /archive : Move &#39;finshed&#39; file to archive.
          **/
         rest()
                 .put("/archive")

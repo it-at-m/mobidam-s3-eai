@@ -4,13 +4,14 @@ public class Constants {
 
     public static final String MOBIDAM_LOGGER = "de.muenchen.mobidam";
     public static final String CAMEL_SERVLET_CONTEXT_PATH = "CamelServletContextPath";
+    public static final String ARCHIVE_ENTITY = "ArchiveEntity";
 
     /*
      * Must be compatible with parameters in resource/openapi_rest_s3_v1.yaml
      */
     public static final String CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER = "/filesInFolder";
     public static final String CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL = "/presignedUrl";
-    public static final String CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE_URL = "/archive";
+    public static final String CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE = "/archive";
     public static final String PATH_ALIAS_PREFIX = "path";
     public static final String BUCKET_NAME = "bucketName";
     public static final String OBJECT_NAME = "objectName";
