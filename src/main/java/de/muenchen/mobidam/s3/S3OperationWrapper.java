@@ -39,15 +39,15 @@ public class S3OperationWrapper implements Processor {
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
 
-        var prefix = exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class) != null
-                ? exchange.getIn().getHeader(Constants.PATH_ALIAS_PREFIX, Boolean.class)
+        var prefix = exchange.getIn().getHeader(Constants.PREFIX_ARCHIVE, Boolean.class) != null
+                ? exchange.getIn().getHeader(Constants.PREFIX_ARCHIVE, Boolean.class)
                 : false;
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
             exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
             var bucketOrBucketArchive = prefix ? Constants.S3_PREFIX + archive : Constants.S3_DELIMITER + delimiter;
-            exchange.getIn().setHeader(Constants.PATH_ALIAS_PREFIX, bucketOrBucketArchive);
+            exchange.getIn().setHeader(Constants.PREFIX_ARCHIVE, bucketOrBucketArchive);
             break;
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:

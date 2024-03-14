@@ -125,7 +125,7 @@ class S3PrefixTest {
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, Boolean.TRUE)
+                .withHeader(Constants.PREFIX_ARCHIVE, Boolean.TRUE)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -141,7 +141,7 @@ class S3PrefixTest {
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
                 .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PATH_ALIAS_PREFIX, Boolean.FALSE)
+                .withHeader(Constants.PREFIX_ARCHIVE, Boolean.FALSE)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

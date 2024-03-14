@@ -31,7 +31,7 @@ public class S3Api extends RouteBuilder {
                 .description("Bucket name")
                 .endParam()
                 .param()
-                .name("path")
+                .name("archive")
                 .type(RestParamType.query)
                 .required(false)
                 .description("S3 path")

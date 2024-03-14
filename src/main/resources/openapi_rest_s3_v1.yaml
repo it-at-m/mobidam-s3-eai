@@ -65,12 +65,12 @@ paths:
             type: string
             example: MyBucketName
           required: true
-        - name: path
-          description: S3 path
+        - name: archived
+          description: Move file to bucket 'archive'
           in: query
           schema:
             type: boolean
-            example: true or false
+            example: true
           required: false
       responses:
         '200':

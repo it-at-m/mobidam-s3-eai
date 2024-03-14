@@ -55,7 +55,7 @@ class S3ApiPresignedUrlTest {
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PREFIX_ARCHIVE));
         Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
@@ -63,12 +63,12 @@ class S3ApiPresignedUrlTest {
     public void test_RouteWithPathHeaderExistTest() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/presignedUrl?bucketName=TEST&path=FOO", null);
+        producer.sendBody("http:127.0.0.1:8081/api/presignedUrl?bucketName=TEST&archived=true", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("FOO", exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
+        Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PREFIX_ARCHIVE, Boolean.class));
         Assertions.assertEquals("/presignedUrl", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
