@@ -2,9 +2,6 @@ name: Compliance check and build test
 
 on:
   push:
-    branches-ignore:
-      - 'sprint'
-      - 'main'
   pull_request:
     types: [ opened, reopened ]
 
