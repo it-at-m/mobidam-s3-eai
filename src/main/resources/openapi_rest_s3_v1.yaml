@@ -52,7 +52,14 @@ paths:
             type: string
             example: MyBucketName
           required: true
-        - name: archive
+        - name: path
+          description: S3 path
+          in: query
+          schema:
+            type: string
+            example: my/path/name
+          required: false  
+        - name: archived
           description: Move file to bucket 'archive'
           in: query
           schema:

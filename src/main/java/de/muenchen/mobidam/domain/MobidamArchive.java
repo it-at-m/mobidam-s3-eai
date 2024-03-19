@@ -7,7 +7,6 @@ package de.muenchen.mobidam.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.*;
 
 /**
@@ -28,10 +27,6 @@ public class MobidamArchive extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
     @Column(nullable = false)
     @NotEmpty
     private String bucket;
@@ -40,7 +35,7 @@ public class MobidamArchive extends BaseEntity {
     private String path;
     @Column(nullable = false)
     @NotEmpty
-    private LocalDate date;
+    private LocalDate creation;
     @Column(nullable = false)
     @NotEmpty
     private LocalDate expiration;

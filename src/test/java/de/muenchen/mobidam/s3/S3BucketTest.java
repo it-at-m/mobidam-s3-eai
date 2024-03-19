@@ -121,7 +121,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, "foo")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, "foo")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -136,7 +136,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, null)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, null)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -150,7 +150,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, "")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, "")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

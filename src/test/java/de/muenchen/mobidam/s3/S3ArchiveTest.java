@@ -70,10 +70,7 @@ class S3ArchiveTest {
     @Value("${mobidam.archive.name:archive}")
     private String archive;
 
-    @Value("${mobidam.archive.delimiter:/}")
-    private String delimiter;
-
-    @Value("${mobidam.archive.expiration-month:/}")
+    @Value("${mobidam.archive.expiration-months:1}")
     private int expiration;
 
     @BeforeAll
@@ -123,21 +120,22 @@ class S3ArchiveTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.OBJECT_NAME, OBJECT_KEY)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, OBJECT_KEY)
+                .withHeader(Constants.PARAMETER_PATH, "sub1/sub2")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
         Assertions.assertEquals(1, bucketContent.contents().size());
-        Assertions.assertEquals(archive + delimiter + OBJECT_KEY, bucketContent.contents().get(0).key());
+        Assertions.assertEquals(archive + "/sub1/sub2/" + OBJECT_KEY, bucketContent.contents().get(0).key());
 
         var dbContent = archiveRepository.findAll();
         Assertions.assertEquals(1, dbContent.size());
-        Assertions.assertEquals(archive + delimiter + OBJECT_KEY, dbContent.get(0).getPath());
+        Assertions.assertEquals(archive + "/sub1/sub2/" + OBJECT_KEY, dbContent.get(0).getPath());
         Assertions.assertEquals(TEST_BUCKET, dbContent.get(0).getBucket());
-        Assertions.assertEquals(LocalDate.now(), dbContent.get(0).getDate());
+        Assertions.assertEquals(LocalDate.now(), dbContent.get(0).getCreation());
         Assertions.assertEquals(LocalDate.now().plusMonths(expiration), dbContent.get(0).getExpiration());
 
     }

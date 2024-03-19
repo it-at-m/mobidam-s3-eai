@@ -24,35 +24,27 @@ public class S3OperationWrapper implements Processor {
     @Value("${mobidam.download.expiration:30}")
     private int downloadExpiration;
 
-    @Value("${mobidam.archive.expiration-month:1}")
+    @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
 
     @Value("${mobidam.archive.name:archive}")
-    private String archive;
-
-    @Value("${mobidam.archive.delimiter:/}")
-    private String delimiter;
+    private String archiveName;
 
     @Override
     public void process(Exchange exchange) throws Exception {
 
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
-        var bucketName = exchange.getIn().getHeader(Constants.BUCKET_NAME, String.class);
-
-        var prefix = exchange.getIn().getHeader(Constants.PREFIX_ARCHIVE, Boolean.class) != null
-                ? exchange.getIn().getHeader(Constants.PREFIX_ARCHIVE, Boolean.class)
-                : false;
+        var bucketName = exchange.getIn().getHeader(Constants.PARAMETER_BUCKET_NAME, String.class);
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
             exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
-            var bucketOrBucketArchive = prefix ? Constants.S3_PREFIX + archive : Constants.S3_DELIMITER + delimiter;
-            exchange.getIn().setHeader(Constants.PREFIX_ARCHIVE, bucketOrBucketArchive);
+            exchange.getIn().setHeader(Constants.PARAMETER_ARCHIVED, constructPrefixOrDelimiterPattern(exchange));
             break;
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
 
-            var objectName = exchange.getIn().getHeader(Constants.OBJECT_NAME, String.class);
+            var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
 
             if (Strings.isNullOrEmpty(bucketName)) {
                 ErrorResponse res = ErrorResponseBuilder.build(400, "Bucket name is empty");
@@ -66,7 +58,10 @@ public class S3OperationWrapper implements Processor {
                 throw new MobidamException("Object name is empty");
             }
 
-            var key = prefix ? archive + delimiter + objectName : objectName;
+            var archive = exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class) != null
+                    ? exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class)
+                    : false;
+            var key = archive ? constructPrefixOrDelimiterPattern(exchange) + objectName : objectName;
 
             var objectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
 
@@ -80,16 +75,19 @@ public class S3OperationWrapper implements Processor {
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
 
-            objectName = exchange.getIn().getHeader(Constants.OBJECT_NAME, String.class);
+            objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
 
             exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
             exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
-            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, archive + delimiter + objectName);
+            var path = exchange.getIn().getHeader(Constants.PARAMETER_PATH, String.class);
+            var destinationKey = path != null ? archiveName + Constants.DELIMITER + (path.endsWith(Constants.DELIMITER) ? path : path + Constants.DELIMITER)
+                    : archiveName + Constants.DELIMITER;
+            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, destinationKey + objectName);
 
             var archiveNotice = new MobidamArchive();
             archiveNotice.setBucket(bucketName);
             archiveNotice.setPath(exchange.getIn().getHeader(AWS2S3Constants.DESTINATION_KEY, String.class));
-            archiveNotice.setDate(LocalDate.now());
+            archiveNotice.setCreation(LocalDate.now());
             archiveNotice.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
             exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveNotice);
 
@@ -99,6 +97,26 @@ public class S3OperationWrapper implements Processor {
             exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
             throw new MobidamException("REST ContextPath not found : " + contextPath);
         }
+    }
+
+    private String constructPrefixOrDelimiterPattern(Exchange exchange) {
+
+        var archive = exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class) != null
+                ? exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class)
+                : false;
+        var path = exchange.getIn().getHeader(Constants.PARAMETER_PATH, String.class);
+
+        var prefixPattern = path != null ? path.endsWith(Constants.DELIMITER) ? path : path + Constants.DELIMITER : "";
+        if (archive)
+            if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class).equals(Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
+                prefixPattern = Constants.ARCHIVE_PATH + prefixPattern;
+            else
+                prefixPattern = Constants.S3_PREFIX + Constants.ARCHIVE_PATH + prefixPattern;
+        else
+            prefixPattern = Constants.S3_PREFIX + prefixPattern;
+
+        return prefixPattern;
+
     }
 
 }

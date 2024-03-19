@@ -42,8 +42,9 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.OBJECT_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
@@ -55,8 +56,9 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.OBJECT_NAME));
+        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
@@ -68,8 +70,22 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.OBJECT_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
+        Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
+    }
+
+    @Test
+    public void test_RouteWithBucketNameAndObjectNameAndPathHeaderExistTest() throws InterruptedException {
+
+        commonRoute.expectedMessageCount(1);
+        producer.sendBody("http:127.0.0.1:8081/api/archive?bucketName=TEST&objectName=sub1/sub2/TEST&httpMethod=PUT", null);
+        commonRoute.assertIsSatisfied();
+
+        var exchange = commonRoute.getExchanges().get(0);
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("sub1/sub2/TEST", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 

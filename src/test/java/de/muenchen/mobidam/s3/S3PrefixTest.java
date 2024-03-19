@@ -61,6 +61,8 @@ class S3PrefixTest {
 
     private static final String TEST_BUCKET = "test-bucket";
 
+    private static final String TEST_PATH = "sub2/sub3";
+
     @BeforeAll
     public static void setUp() throws URISyntaxException {
 
@@ -94,7 +96,11 @@ class S3PrefixTest {
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/File_2.csv").build(),
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/sub1/File_2.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(TEST_PATH + "/File_3.csv").build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("archive/" + TEST_PATH + "/File_4.csv").build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
     }
@@ -105,49 +111,100 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixTest() {
+    public void test_RouteWithNoPrefixNoArchiveTest() {
 
+        /*
+         * Nur Delimiter im Root Verzeichnis gibt es nicht mehr. Keine Files im Root Verzeichnis zu
+         * erwarten.
+         */
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
-        Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
+        Assertions.assertEquals(4, files.size());
 
     }
 
     @Test
-    public void test_RouteWithPrefixTrueTest() {
+    public void test_RouteWithPrefixTrueNoArchiveTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PREFIX_ARCHIVE, Boolean.TRUE)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_PATH, "sub1")
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.TRUE)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("archive/File_2.csv", files.get(0).getKey());
+        Assertions.assertEquals("archive/sub1/File_2.csv", files.get(0).getKey());
 
     }
 
     @Test
-    public void test_RouteWithPrefixFalseTest() {
+    public void test_RouteWithPrefixFalseNoArchiveTest() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
-                .withHeader(Constants.PREFIX_ARCHIVE, Boolean.FALSE)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.FALSE)
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        List<BucketContentInner> files = response.getIn().getBody(List.class);
+        Assertions.assertEquals(4, files.size());
+    }
+
+    @Test
+    public void test_RouteWithPrefixFalseAndArchiveFalseTest() {
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.FALSE)
+                .withHeader(Constants.PARAMETER_PATH, TEST_PATH)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         List<BucketContentInner> files = response.getIn().getBody(List.class);
         Assertions.assertEquals(1, files.size());
-        Assertions.assertEquals("File_1.csv", files.get(0).getKey());
+        Assertions.assertEquals(TEST_PATH + "/File_3.csv", files.get(0).getKey());
+    }
+
+    @Test
+    public void test_RouteWithPrefixFalseAndArchiveFalseAndDelimiterTest() {
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.FALSE)
+                .withHeader(Constants.PARAMETER_PATH, TEST_PATH + Constants.DELIMITER)
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        List<BucketContentInner> files = response.getIn().getBody(List.class);
+        Assertions.assertEquals(1, files.size());
+        Assertions.assertEquals(TEST_PATH + "/File_3.csv", files.get(0).getKey());
+    }
+
+    @Test
+    public void test_RouteWithPrefixFalseAndArchiveTrueTest() {
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.TRUE)
+                .withHeader(Constants.PARAMETER_PATH, TEST_PATH)
+                .build();
+        var response = producer.send("{{camel.route.common}}", s3Request);
+
+        List<BucketContentInner> files = response.getIn().getBody(List.class);
+        Assertions.assertEquals(1, files.size());
+        Assertions.assertEquals("archive/" + TEST_PATH + "/File_4.csv", files.get(0).getKey());
     }
 
 }
