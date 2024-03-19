@@ -69,18 +69,19 @@ public class S3RouteBuilder extends RouteBuilder {
                 .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=${header.%4$s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&${header.%5$s}",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PREFIX_ARCHIVE))
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION,
+                        Constants.PARAMETER_ARCHIVED))
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%4$s",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.copyObject))
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.copyObject))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.deleteObject))
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.deleteObject))
                 .setBody(simple(String.format("${exchangeProperty.%s}", Constants.ARCHIVE_ENTITY)))
                 .to("bean:archiveService?method=save")
                 .otherwise()

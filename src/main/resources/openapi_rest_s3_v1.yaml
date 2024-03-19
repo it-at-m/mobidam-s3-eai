@@ -42,7 +42,7 @@ paths:
       tags:
         - Bucket
       operationId: viewFilesInFolder
-      summary: Get S3 bucket object list
+      summary: Get S3 bucket object list. 
       description: "Each department has its own S3 bucket."
       parameters:
         - name: bucketName
@@ -52,8 +52,15 @@ paths:
             type: string
             example: MyBucketName
           required: true
-        - name: archive
-          description: Move file to bucket 'archive'
+        - name: path
+          description: S3 path
+          in: query
+          schema:
+            type: string
+            example: my/path/name
+          required: false  
+        - name: archived
+          description: "Show files in 'archive' path. Each bucket has a predefined 'archive' path to which all files archived with 'PUT /archive' are moved. E.g.: archive/[my/path/name].The combination of 'path=...&archived=true' lists the archived files of the specified 'path'. "
           in: query
           schema:
             type: boolean
@@ -124,7 +131,7 @@ paths:
       tags: 
         - Files
       summary: Move 'processed' file to archive.
-      description: "'archive' is tenant wide constant for all buckets"
+      description: "'archive' is tenant wide constant for all buckets."
       operationId: moveFinishedFileToArchive
       parameters:
         - name: bucketName

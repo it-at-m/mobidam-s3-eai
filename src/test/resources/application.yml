@@ -32,8 +32,7 @@ camel:
 mobidam:
   archive:
     name: archive
-    delimiter: /
-    expiration-month: 1
+    expiration-months: 1
   limit:
     search:
       items: 20

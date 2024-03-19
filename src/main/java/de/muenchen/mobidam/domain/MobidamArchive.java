@@ -7,16 +7,12 @@ package de.muenchen.mobidam.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.*;
 
 /**
- * This class represents a TheEntity.
- * <p>
- * The entity's content will be loaded according to the reference variable.
- * </p>
+ * This class represents a the mobidam archive entity.
+ * All files archived in S3 have a database entry.
  */
-// Definition of getter, setter, ...
 @Entity
 @Table(name = "Archive", schema = "mdass3eai")
 @Getter
@@ -28,10 +24,6 @@ public class MobidamArchive extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
     @Column(nullable = false)
     @NotEmpty
     private String bucket;
@@ -40,7 +32,7 @@ public class MobidamArchive extends BaseEntity {
     private String path;
     @Column(nullable = false)
     @NotEmpty
-    private LocalDate date;
+    private LocalDate creation;
     @Column(nullable = false)
     @NotEmpty
     private LocalDate expiration;

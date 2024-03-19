@@ -46,7 +46,7 @@ import software.amazon.awssdk.services.s3.model.*;
                 "FOO_SECRET_KEY=bar"
         }
 )
-@EnableAutoConfiguration()
+@EnableAutoConfiguration
 @DirtiesContext
 class S3FileLimitTest {
 
@@ -110,7 +110,7 @@ class S3FileLimitTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

@@ -24,7 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
-@EnableAutoConfiguration()
+@EnableAutoConfiguration
 @DirtiesContext
 class S3ServletContextPathNotFoundTest {
 
@@ -41,7 +41,7 @@ class S3ServletContextPathNotFoundTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "NotFound")
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

@@ -40,7 +40,7 @@ public class S3CredentialProvider implements Processor {
     }
 
     private String verifyBucket(Exchange exchange) throws MobidamException {
-        String bucketName = exchange.getMessage().getHeader(Constants.BUCKET_NAME, String.class);
+        String bucketName = exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME, String.class);
         if (Strings.isNullOrEmpty(bucketName)) {
             exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Bucket name is missing"));
             throw new MobidamException("Bucket name is missing");

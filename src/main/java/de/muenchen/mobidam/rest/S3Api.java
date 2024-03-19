@@ -31,10 +31,16 @@ public class S3Api extends RouteBuilder {
                 .description("Bucket name")
                 .endParam()
                 .param()
-                .name("archive")
+                .name("path")
                 .type(RestParamType.query)
                 .required(false)
                 .description("S3 path")
+                .endParam()
+                .param()
+                .name("archived")
+                .type(RestParamType.query)
+                .required(false)
+                .description("Return archived files")
                 .endParam()
                 .to("{{camel.route.common}}");
 

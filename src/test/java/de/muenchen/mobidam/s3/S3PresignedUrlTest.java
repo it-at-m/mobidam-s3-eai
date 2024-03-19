@@ -46,7 +46,7 @@ import software.amazon.awssdk.services.s3.model.*;
                 "FOO_SECRET_KEY=bar"
         }
 )
-@EnableAutoConfiguration()
+@EnableAutoConfiguration
 @DirtiesContext
 class S3PresignedUrlTest {
 
@@ -110,8 +110,8 @@ class S3PresignedUrlTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
-                .withHeader(Constants.OBJECT_NAME, "File_1.csv")
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, "File_1.csv")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -130,9 +130,9 @@ class S3PresignedUrlTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
-                .withHeader(Constants.OBJECT_NAME, "File_1.csv")
-                .withHeader(Constants.PREFIX_ARCHIVE, Boolean.TRUE)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, "File_1.csv")
+                .withHeader(Constants.PARAMETER_ARCHIVED, Boolean.TRUE)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -152,8 +152,8 @@ class S3PresignedUrlTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
-                .withHeader(Constants.OBJECT_NAME, "FileNotExist.csv")
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, "FileNotExist.csv")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -172,8 +172,8 @@ class S3PresignedUrlTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
-                .withHeader(Constants.OBJECT_NAME, "FileNotExist.csv")
-                .withHeader(Constants.BUCKET_NAME, "BucketNotExist")
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, "FileNotExist.csv")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, "BucketNotExist")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -188,7 +188,7 @@ class S3PresignedUrlTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL)
-                .withHeader(Constants.BUCKET_NAME, "BucketNotExist")
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, "BucketNotExist")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

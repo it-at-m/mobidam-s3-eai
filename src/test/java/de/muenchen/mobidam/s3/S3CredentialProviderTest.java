@@ -38,7 +38,7 @@ public class S3CredentialProviderTest {
         String value = "BAR";
         configureEnvironment(bucketName, envVar, value);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.BUCKET_NAME, bucketName);
+        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, bucketName);
 
         // When
         s3CredentialProvider.process(exchange);
@@ -57,7 +57,7 @@ public class S3CredentialProviderTest {
         configureEnvironment(bucketName, envVar, value);
         Mockito.when(environmentReader.getEnvironmentVariable(Mockito.anyString())).thenReturn(null);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.BUCKET_NAME, bucketName);
+        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, bucketName);
 
         // Then
         Assertions.assertThrows(MobidamException.class, () -> {
@@ -74,7 +74,7 @@ public class S3CredentialProviderTest {
         String value = "BAR";
         configureEnvironment(bucketName, envVar, value);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.BUCKET_NAME, "invalid_bucket");
+        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, "invalid_bucket");
 
         // Then
         Assertions.assertThrows(MobidamException.class, () -> {
