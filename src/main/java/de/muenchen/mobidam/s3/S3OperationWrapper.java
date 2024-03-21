@@ -62,7 +62,6 @@ public class S3OperationWrapper implements Processor {
                     ? exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class)
                     : false;
             var key = archive ? constructPrefixPattern(exchange) + objectName : objectName;
-
             var objectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
 
             var presignRequest = GetObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(downloadExpiration))
