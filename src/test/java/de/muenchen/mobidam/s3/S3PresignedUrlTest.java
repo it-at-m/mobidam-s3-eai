@@ -102,7 +102,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlTest() {
+    public void test_RouteWithPresignedUrl() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
@@ -122,7 +122,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlWithPrefixTest() {
+    public void test_RouteWithPresignedUrlWithPrefix() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
@@ -144,7 +144,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlObjectNotExistTest() {
+    public void test_RouteWithPresignedUrlObjectNotExist() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
@@ -164,7 +164,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlBucketNotExistTest() {
+    public void test_RouteWithPresignedUrlBucketNotExist() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),

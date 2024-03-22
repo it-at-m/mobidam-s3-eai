@@ -35,7 +35,7 @@ class S3ApiFilesInFolderTest {
     private MockEndpoint commonRoute;
 
     @Test
-    public void test_RouteWithBucketNameHeaderNotExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderNotExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder", null);
@@ -47,7 +47,7 @@ class S3ApiFilesInFolderTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameHeaderEmptyTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderEmpty() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=", null);
@@ -59,7 +59,7 @@ class S3ApiFilesInFolderTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST", null);
@@ -72,7 +72,7 @@ class S3ApiFilesInFolderTest {
     }
 
     @Test
-    public void test_RouteWithArchiveHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithArchiveHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&archived=true", null);
@@ -85,7 +85,7 @@ class S3ApiFilesInFolderTest {
     }
 
     @Test
-    public void test_RouteWithArchiveAndPathHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithArchiveAndPathHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&archived=true&path=sub1/sub2", null);

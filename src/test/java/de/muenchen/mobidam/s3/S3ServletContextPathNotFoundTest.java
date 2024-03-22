@@ -37,7 +37,7 @@ class S3ServletContextPathNotFoundTest {
     private static final String TEST_BUCKET = "test-bucket";
 
     @Test
-    public void test_RouteWithServletContextNotFoundTest() {
+    public void test_RouteWithServletContextNotFound() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "NotFound")

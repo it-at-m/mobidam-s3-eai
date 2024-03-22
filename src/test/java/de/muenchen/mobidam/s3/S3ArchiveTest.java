@@ -114,7 +114,7 @@ class S3ArchiveTest {
     }
 
     @Test
-    public void test_RouteWithArchiveTest() {
+    public void test_RouteWithArchive() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
