@@ -35,7 +35,7 @@ class S3ApiArchiveTest {
     private MockEndpoint commonRoute;
 
     @Test
-    public void test_RouteWithBucketNameAndObjectNameHeaderNotExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameAndObjectNameHeaderNotExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/archive?httpMethod=PUT", null);
@@ -49,7 +49,7 @@ class S3ApiArchiveTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameAndObjectNameHeaderEmptyTest() throws InterruptedException {
+    public void test_RouteWithBucketNameAndObjectNameHeaderEmpty() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/archive?bucketName=&objectName=&httpMethod=PUT", null);
@@ -63,7 +63,7 @@ class S3ApiArchiveTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameAndObjectNameHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameAndObjectNameHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/archive?bucketName=TEST&objectName=TEST&httpMethod=PUT", null);

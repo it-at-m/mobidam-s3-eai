@@ -106,7 +106,7 @@ class S3FileLimitTest {
     }
 
     @Test
-    public void test_RouteWithExceedFileLimitTest() {
+    public void test_RouteWithExceedFileLimit() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)

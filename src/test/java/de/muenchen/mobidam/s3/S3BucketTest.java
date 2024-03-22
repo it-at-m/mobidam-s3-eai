@@ -104,7 +104,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameParameterNotExistTest() {
+    public void test_RouteWithBucketNameParameterNotExist() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -117,7 +117,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNotFoundTest() {
+    public void test_RouteWithBucketNameNotFound() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -132,7 +132,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNullTest() {
+    public void test_RouteWithBucketNameNull() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -146,7 +146,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameEmptyTest() {
+    public void test_RouteWithBucketNameEmpty() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)

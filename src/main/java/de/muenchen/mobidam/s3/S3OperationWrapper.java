@@ -11,7 +11,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
-import org.apache.camel.tooling.model.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -42,13 +41,6 @@ public class S3OperationWrapper implements Processor {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
-
-            if (Strings.isNullOrEmpty(bucketName)) {
-                ErrorResponse res = ErrorResponseBuilder.build(400, "Bucket name is empty");
-                exchange.getMessage().setBody(res);
-                throw new MobidamException("Bucket name is empty");
-            }
-
             if (objectName == null) {
                 ErrorResponse res = ErrorResponseBuilder.build(400, "Object name is empty");
                 exchange.getMessage().setBody(res);
@@ -72,6 +64,11 @@ public class S3OperationWrapper implements Processor {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
 
             objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
+            if (objectName == null) {
+                ErrorResponse res = ErrorResponseBuilder.build(400, "Object name is empty");
+                exchange.getMessage().setBody(res);
+                throw new MobidamException("Object name is empty");
+            }
 
             exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
             exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);

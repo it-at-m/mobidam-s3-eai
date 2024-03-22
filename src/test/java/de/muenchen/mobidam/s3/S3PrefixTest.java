@@ -111,7 +111,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithNoPrefixNoArchiveTest() {
+    public void test_RouteWithNoPrefixNoArchive() {
 
         /*
          * Nur Delimiter im Root Verzeichnis gibt es nicht mehr. Keine Files im Root Verzeichnis zu
@@ -129,7 +129,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixTrueNoArchiveTest() {
+    public void test_RouteWithPrefixTrueNoArchive() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -146,7 +146,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixFalseNoArchiveTest() {
+    public void test_RouteWithPrefixFalseNoArchive() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -160,7 +160,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixFalseAndArchiveFalseTest() {
+    public void test_RouteWithPrefixFalseAndArchiveFalse() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -176,7 +176,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixFalseAndArchiveFalseAndDelimiterTest() {
+    public void test_RouteWithPrefixFalseAndArchiveFalseAndDelimiter() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -192,7 +192,7 @@ class S3PrefixTest {
     }
 
     @Test
-    public void test_RouteWithPrefixFalseAndArchiveTrueTest() {
+    public void test_RouteWithPrefixFalseAndArchiveTrue() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)

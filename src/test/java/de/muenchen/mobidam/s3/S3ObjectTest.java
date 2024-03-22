@@ -100,7 +100,7 @@ class S3ObjectTest {
     }
 
     @Test
-    public void test_RouteWithListObjectTest() {
+    public void test_RouteWithListObject() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
