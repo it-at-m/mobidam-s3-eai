@@ -49,7 +49,7 @@ import software.amazon.awssdk.services.s3.model.*;
 @DirtiesContext
 class S3PrefixTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Autowired

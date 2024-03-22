@@ -28,7 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class S3ServletContextPathNotFoundTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Autowired

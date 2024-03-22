@@ -53,7 +53,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 @DirtiesContext
 class S3BucketTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Autowired
