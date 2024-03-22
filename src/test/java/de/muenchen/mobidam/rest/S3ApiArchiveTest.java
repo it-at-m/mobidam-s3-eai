@@ -23,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/S3Api" }
 )
-@EnableAutoConfiguration()
+@EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = { "camel.route.common=mock:common" })
 class S3ApiArchiveTest {
@@ -73,19 +73,6 @@ class S3ApiArchiveTest {
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
-        Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
-    }
-
-    @Test
-    public void test_RouteWithBucketNameAndObjectNameAndPathHeaderExistTest() throws InterruptedException {
-
-        commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/archive?bucketName=TEST&objectName=sub1/sub2/TEST&httpMethod=PUT", null);
-        commonRoute.assertIsSatisfied();
-
-        var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
-        Assertions.assertEquals("sub1/sub2/TEST", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 

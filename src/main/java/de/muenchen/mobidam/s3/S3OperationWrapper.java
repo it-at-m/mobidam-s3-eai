@@ -27,9 +27,6 @@ public class S3OperationWrapper implements Processor {
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
 
-    @Value("${mobidam.archive.name:archive}")
-    private String archiveName;
-
     @Override
     public void process(Exchange exchange) throws Exception {
 
@@ -78,34 +75,20 @@ public class S3OperationWrapper implements Processor {
 
             exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
             exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
-            var path = exchange.getIn().getHeader(Constants.PARAMETER_PATH, String.class);
-            var destinationKey = getDestinationKey(path);
-            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, destinationKey + objectName);
+            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, Constants.ARCHIVE_PATH + objectName);
 
-            var archiveNotice = new MobidamArchive();
-            archiveNotice.setBucket(bucketName);
-            archiveNotice.setPath(exchange.getIn().getHeader(AWS2S3Constants.DESTINATION_KEY, String.class));
-            archiveNotice.setCreation(LocalDate.now());
-            archiveNotice.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
-            exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveNotice);
+            var archiveEntity = new MobidamArchive();
+            archiveEntity.setBucket(bucketName);
+            archiveEntity.setPath(exchange.getIn().getHeader(AWS2S3Constants.DESTINATION_KEY, String.class));
+            archiveEntity.setCreation(LocalDate.now());
+            archiveEntity.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
+            exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveEntity);
 
             break;
 
         default:
             exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
             throw new MobidamException("REST ContextPath not found : " + contextPath);
-        }
-    }
-
-    private String getDestinationKey(String path) {
-        if (path != null) {
-            if (path.endsWith(Constants.DELIMITER))
-                return archiveName + Constants.DELIMITER + path;
-            else
-                return archiveName + Constants.DELIMITER + path + Constants.DELIMITER;
-
-        } else {
-            return archiveName + Constants.DELIMITER;
         }
     }
 

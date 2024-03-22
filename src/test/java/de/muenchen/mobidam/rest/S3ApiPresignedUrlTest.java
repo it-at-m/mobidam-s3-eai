@@ -23,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.springboot.java-routes-include-pattern=**/S3Api" }
 )
-@EnableAutoConfiguration()
+@EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = { "camel.route.common=mock:common" })
 class S3ApiPresignedUrlTest {

@@ -14,7 +14,6 @@ camel:
 
 mobidam:
   archive:
-    name: archive
     expiration-months: 1
   limit:
     search:

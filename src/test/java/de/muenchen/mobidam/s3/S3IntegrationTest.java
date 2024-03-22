@@ -31,7 +31,7 @@ import java.util.Collection;
 @ActiveProfiles("integration")
 class S3IntegrationTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Value("${camel.component.aws2-s3.override-endpoint}")
