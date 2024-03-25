@@ -7,7 +7,7 @@ on:
 jobs:
   checklist-check:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor != 'renovate[bot]' }}
     steps:
       - uses: mheap/require-checklist-action@v2
         with:
