@@ -1,0 +1,108 @@
+name: Build release
+
+on: [workflow_dispatch]
+
+jobs:
+  release:
+    name: Release to registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout to main branch # Releases are published on main branch
+        uses: actions/checkout@v4
+        with: { ref: main }
+
+      - name: Install Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: "maven"
+
+      - name: Clean Maven Project Version
+        id: set-version
+        run: |
+          current_version=$(mvn help:evaluate -f pom.xml -Dexpression=project.version -q -DforceStdout)
+          echo "Current version: $current_version"
+          new_version=$(echo $current_version | sed 's/-SNAPSHOT//')
+          echo "New version: $new_version"
+          mvn -B versions:set -f pom.xml -DnewVersion=$new_version
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add pom.xml
+          git commit -m "Bump main version to $new_version"
+          git push
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Build with Maven
+        run: mvn -B verify -f pom.xml -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/it-at-m/mobidam-s3-eai:${{ steps.set-version.outputs.new_version }}, ghcr.io/it-at-m/mobidam-s3-eai:demo
+
+  github-release:
+    needs: release
+    name: Create github release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout to main branch # Releases are published on main branch
+        uses: actions/checkout@v4
+        with: { ref: main }
+
+      - name: Get New Project Version
+        id: get-version
+        run: |
+          current_version=$(mvn help:evaluate -f pom.xml -Dexpression=project.version -q -DforceStdout)
+          new_version=$(echo $current_version | sed 's/-SNAPSHOT//')
+          echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get-version.outputs.new_version }}
+          release_name: Release ${{ steps.get-version.outputs.new_version }}
+          draft: false
+          prerelease: false
+
+  increase-snapshot:
+    needs: release
+    name: Increase patch-number of the SNAPSHOT-Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout to sprint branch # Snapshots are published on sprint branch
+        uses: actions/checkout@v4
+        with: { ref: sprint }
+
+      - name: Set Maven Project Version
+        id: set-version
+        run: |
+          current_version=$(mvn help:evaluate -f pom.xml -Dexpression=project.version -q -DforceStdout)
+          echo "Current version: $current_version"
+          new_version=$(echo $current_version | awk -F. -v OFS=. '{$3=$3+1; print $0"-SNAPSHOT"}')
+          echo "New version: $new_version"
+          mvn -B versions:set -DnewVersion=$new_version -f pom.xml
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add pom.xml
+          git commit -m "Bump version to $new_version"
+          git push

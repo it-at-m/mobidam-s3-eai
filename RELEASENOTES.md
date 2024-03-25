@@ -1,9 +1,10 @@
 # Release-Notes
 
-## Sprint 7 (05.02.2024 - 26.03.2024)
+## Sprint 7 (05.03.2024 - 26.03.2024)
 ### Hinzugefügt
 - Archivierung
 - Url vorsignierte Adresse erstellen
+- Workflows erstellt
 
 ## Sprint 7 (13.02.2024 - 05.03.2024)
 ### Hinzugefügt

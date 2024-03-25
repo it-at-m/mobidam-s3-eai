@@ -1,0 +1,14 @@
+name: Require Checklist
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  checklist-check:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'renovate[bot]' }}
+    steps:
+      - uses: mheap/require-checklist-action@v2
+        with:
+          requireChecklist: true
