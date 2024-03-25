@@ -65,20 +65,41 @@ public class S3RouteBuilder extends RouteBuilder {
                 .log(String.format("CamelServletContextPath: ${header.%s}", Constants.CAMEL_SERVLET_CONTEXT_PATH))
                 .process("s3CredentialProvider")
                 .choice()
+                /*
+                 * ServletContext path : /filesInFolder
+                 */
                 .when()
                 .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
                 .toD(String.format(
-                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&operation=${header.%s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=${header.%s}",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION, Constants.PATH_ALIAS_PREFIX))
+                        "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=${header.%4$s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&${header.%5$s}",
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION,
+                        Constants.PARAMETER_ARCHIVED))
+                /*
+                 * ServletContext path : /presignedUrl
+                 */
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
                 .toD(String.format(
-                        "aws2-s3://${header.%s}?accessKey=${header.%s}&secretKey=${header.%s}&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%s",
-                        Constants.BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
+                        "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%4$s",
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
+                /*
+                 * ServletContext path : /archive
+                 */
+                .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE))
+                .toD(String.format(
+                        "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.copyObject))
+                .toD(String.format(
+                        "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.deleteObject))
+                .setBody(simple(String.format("${exchangeProperty.%s}", Constants.ARCHIVE_ENTITY)))
+                .to("bean:archiveService?method=save")
+                /*
+                 * ServletContext path not found
+                 */
                 .otherwise()
                 .throwException(new MobidamException("REST ContextPath not found."))
                 .end()
                 .process("restResponseWrapper");
 
     }
-
 }

@@ -28,7 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 class S3ServletContextPathNotFoundTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Autowired
@@ -37,11 +37,11 @@ class S3ServletContextPathNotFoundTest {
     private static final String TEST_BUCKET = "test-bucket";
 
     @Test
-    public void test_RouteWithServletContextNotFoundTest() {
+    public void test_RouteWithServletContextNotFound() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "NotFound")
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

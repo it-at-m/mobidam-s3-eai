@@ -18,12 +18,53 @@ Die Enterprise Application Integration Komponente (EAI) bietet eine Webschnittst
 Github-Repo:  https://github.com/it-at-m/mobidam-s3-eai
 
 # Technisches Setup
+# S3
+Unser LHM S3 ist eine Implementierung von [StorageGrid](https://docs.netapp.com/us-en/storagegrid-family/).
+
+Für das Projekt existiert ein S3 Tenant dem auf Antrag neue Buckets hinzugefügt werden können.
+Jeder Bucket ist fachlich einer Schnittstelle zugeordnet.
+
+Innerhalb des Buckets können Dateien mit einem 'Prefix' geordnet werden. Z. Bsp. 
+- /Pfad1/Pfad1/Datei1
+- /Pfad1/Pfad1/Datei2
+- /Pfad1/Pfad2/Datei1
+- ...
+
+Bei einem 'Prefix' handelt es sich nicht um eine Pfad, sondern er ist besser als eine 'vorangestellte' Erweiterung des Dateinamens zu verstehen.
+
+Es wird erwartet das Dateien immer mit einem 'Prefix' in einen S3 Bucket importiert werden. 
+  
 ## Openapi
 Um neue Openapi Java Source Dateien zu erstellen kann das Maven Profil _generate-openapi_ verwendet werden (mvn clean compile -P generate-openapi).
 Das Profil erzeugt die Openapi Java Source Dateien im Maven _target_ Ordner.
 Änderungen und neue Features können in die Klassen im Package _de.muenchen.mobidam.rest_ kopiert werden.
 
 Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
+
+# REST Schnittstelle
+Mit dem [Swagger Editor](https://editor.swagger.io) kann die komplette [Openapi REST Beschreibung](https://github.com/it-at-m/mobidam-s3-eai/blob/sprint/src/main/resources/openapi_rest_s3_v1.yaml) angezeigt werden.
+Der Workflow für den Import von Dateien in FME sieht folgende Schritt vor:
+- Anzeigen von Inhalten eines S3 Buckets.
+- Erzeugen eines Download Links für eine Datei.
+- Nach dem Herunterladen und dem Import in FME verschieben der Datei in Archiv innerhalb des Buckets. Für alle Buckets ist 'archiv' ein festgelegter Prefix der in allen Buckets gleich ist. Beim Verschieben in das Archiv wird dem Objektnamen bestehend aus Prefix/Objektname das Prefix 'archiv' vorangestellt (s.u).
+- Mit dem Verschiebn in das Bucket Archiv wird zusätzlich ein Datenbankeintrag mit einer Verfallsdauer der Datei geschrieben.
+- Löschen der Datei aus dem S3 nach dem Ablauf der Verfalldauer.
+
+## Anzeigen nicht verarbeiteter Dateien
+Mit der Rest Ressource GET '.../filesInFolder?bucketName=bucket1&path=...[&archived=false]' können die Dateien mit einem bestimmten Prefix selektiert werden.
+
+## Download von Dateien aus dem S3
+Mit der REST Ressource '/presignedUrl' läßt sich ein zeitlich begrenzter Download Link für eine Datei aus einem S3 Bucket erstellen.
+Z.Bsp. : GET '.../presignedUrl?bucketName=bucket1&objectName=Pfad1/Pfad2/Dateiname' 
+
+## Archivieren und Anzeigen von bereits verarbeiteten Dateien
+### Archivieren
+Mit der Rest Ressource '/archive' lassen sich bereits in FME importierte Dateien in einen vordefinierten 'archiv' Pfad verschieben, damit sie nicht noch einmal verarbeitet werden.
+Technisch ist das in S3 eine Erweiterung des Datei Pfads und Namens im S3 Bucket.
+Z.Bsp. : PUT '.../archive?bucketName=bucket1&objectName=Pfad1/Pfad2/Datei' wird innerhalb des 'bucket1' verschoben nach 'archive/Pfad1/Pfad2/Datei'.
+
+### Anzeigen
+Mit der Rest Ressource GET '.../filesInFolder?bucketName=bucket1&path=...&archived=true' können die archivierten Dateien eines Pfades angezeigt werden.
 
 ### Konfiguration
 

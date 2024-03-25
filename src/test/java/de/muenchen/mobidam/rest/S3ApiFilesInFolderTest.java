@@ -35,52 +35,66 @@ class S3ApiFilesInFolderTest {
     private MockEndpoint commonRoute;
 
     @Test
-    public void test_RouteWithBucketNameHeaderNotExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderNotExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.BUCKET_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
     @Test
-    public void test_RouteWithBucketNameHeaderEmptyTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderEmpty() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
+        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
     @Test
-    public void test_RouteWithBucketNameHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithBucketNameHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
         producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
     @Test
-    public void test_RouteWithPathHeaderExistTest() throws InterruptedException {
+    public void test_RouteWithArchiveHeaderExist() throws InterruptedException {
 
         commonRoute.expectedMessageCount(1);
-        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&path=FOO", null);
+        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&archived=true", null);
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.BUCKET_NAME));
-        Assertions.assertEquals("FOO", exchange.getMessage().getHeader(Constants.PATH_ALIAS_PREFIX));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class));
+        Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
+    }
+
+    @Test
+    public void test_RouteWithArchiveAndPathHeaderExist() throws InterruptedException {
+
+        commonRoute.expectedMessageCount(1);
+        producer.sendBody("http:127.0.0.1:8081/api/filesInFolder?bucketName=TEST&archived=true&path=sub1/sub2", null);
+        commonRoute.assertIsSatisfied();
+
+        var exchange = commonRoute.getExchanges().get(0);
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class));
+        Assertions.assertEquals("sub1/sub2", exchange.getMessage().getHeader(Constants.PARAMETER_PATH, String.class));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 

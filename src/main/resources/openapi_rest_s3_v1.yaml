@@ -3,10 +3,10 @@ info:
   title: S3-EAI API
   version: v1
 tags:
-- name: S3
-  description: Files related operations
+  - name: S3
+    description: Files related operations
 servers:
-- url: https://localhost:8080
+  - url: https://localhost:8080
 components:
   schemas:
     BucketContent:
@@ -25,52 +25,61 @@ components:
       properties:
         url:
           type: string
-          description: Download Url  
+          description: Download Url
     ErrorResponse:
       type: object
       properties:
-          timestamp:
-            type: string
-            format: date-time
-          error:
-            type: string
-          status:
-            type: number
+        timestamp:
+          type: string
+          format: date-time
+        error:
+          type: string
+        status:
+          type: number
 paths:
   /filesInFolder:
     get:
       tags:
-      - S3
-      description: Get S3 bucket object list
+        - Bucket
+      operationId: viewFilesInFolder
+      summary: Get S3 bucket object list. 
+      description: "Each department has its own S3 bucket."
       parameters:
-      - name: bucketName
-        description: Bucket name
-        in: query
-        schema:
-          type: string
-          example: MyBucketName
-        required: true
-      - name: path
-        description: S3 path
-        in: query
-        schema:
-          type: string
-          example: MyPathName
-        required: false  
+        - name: bucketName
+          description: Bucket name
+          in: query
+          schema:
+            type: string
+            example: MyBucketName
+          required: true
+        - name: path
+          description: S3 path
+          in: query
+          schema:
+            type: string
+            example: my/path/name
+          required: false  
+        - name: archived
+          description: "Show files in 'archive' path. Each bucket has a predefined 'archive' path to which all files archived with 'PUT /archive' are moved. E.g.: archive/[my/path/name].The combination of 'path=...&archived=true' lists the archived files of the specified 'path'. "
+          in: query
+          schema:
+            type: boolean
+            example: true
+          required: false
       responses:
         '200':
           description: Bucket content
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/BucketContent'
-        '40X':
+                $ref: '#/components/schemas/BucketContent'
+        4XX:
           description: Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '50X':
+        5XX:
           description: Error
           content:
             application/json:
@@ -78,36 +87,79 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /presignedUrl:
     get:
-      description: Retrieve download link
-      tags: 
+      summary: Retrieve download link
+      description: "Download file, process file, archive file."
+      tags:
         - Files
       operationId: viewObjectDownloadLink
       parameters:
-      - name: bucketName
-        description: Bucket name
-        in: query
-        schema:
-          type: string
-          example: MyBucketName
-        required: true
-      - name: objectName
-        description: Object name
-        in: query
-        schema:
-          type: string
-          example: MyObjectName
-        required: true  
-      - name: path
-        description: S3 path/prefix
-        in: query
-        schema:
-          type: string
-          example: MyPathName
-        required: false 
+        - name: bucketName
+          description: Bucket name
+          in: query
+          schema:
+            type: string
+            example: MyBucketName
+          required: true
+        - name: objectName
+          description: Object name
+          in: query
+          schema:
+            type: string
+            example: MyObjectName
+          required: true
       responses:
         '200':
-          description: Download url 
+          description: Download url
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PresignedUrl'
+        4XX:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        5XX:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /archive:
+    put:
+      tags: 
+        - Files
+      summary: Move 'processed' file to archive.
+      description: "'archive' is tenant wide constant for all buckets."
+      operationId: moveFinishedFileToArchive
+      parameters:
+        - name: bucketName
+          description: Bucket name
+          in: query
+          schema:
+            type: string
+            example: MyBucketName
+          required: true
+        - name: objectName
+          description: Object name
+          in: query
+          schema:
+            type: string
+            example: MyObjectName
+          required: true
+      responses:
+        '204':
+          description: File is moved to archive
+        4XX:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        5XX:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

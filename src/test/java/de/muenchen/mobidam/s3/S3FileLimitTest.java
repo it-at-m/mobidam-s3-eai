@@ -50,7 +50,7 @@ import software.amazon.awssdk.services.s3.model.*;
 @DirtiesContext
 class S3FileLimitTest {
 
-    @Produce()
+    @Produce
     private ProducerTemplate producer;
 
     @Autowired
@@ -106,11 +106,11 @@ class S3FileLimitTest {
     }
 
     @Test
-    public void test_RouteWithExceedFileLimitTest() {
+    public void test_RouteWithExceedFileLimit() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

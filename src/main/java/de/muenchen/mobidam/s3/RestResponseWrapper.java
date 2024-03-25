@@ -35,6 +35,9 @@ public class RestResponseWrapper implements Processor {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
             presignedUrl(exchange);
             break;
+        case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
+            exchange.getMessage().setBody(null);
+            break;
         default:
             exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
         }

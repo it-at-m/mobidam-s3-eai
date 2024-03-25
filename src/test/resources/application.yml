@@ -9,6 +9,9 @@ management:
 spring:
   profiles:
     active: default
+  datasource:
+    url: jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS mdass3eai
+
 
 server:
   port: 8081
@@ -27,6 +30,8 @@ camel:
     common: direct:commonOperations
 
 mobidam:
+  archive:
+    expiration-months: 1
   limit:
     search:
       items: 20
