@@ -6,6 +6,7 @@ package de.muenchen.mobidam.rest;
 
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.TestConstants;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 @CamelSpringBootTest
@@ -26,6 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 @EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestPropertySource(properties = { "camel.route.common=mock:common" })
+@ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
 class S3ApiArchiveTest {
 
     @Produce("http:127.0.0.1:8081/api")
