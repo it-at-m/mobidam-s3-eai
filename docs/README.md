@@ -41,6 +41,18 @@ Das Profil erzeugt die Openapi Java Source Dateien im Maven _target_ Ordner.
 
 Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
 
+# Security
+Wird die EAI im Security Modus gestartet, muss der Aufrufer der REST Schnittstelle ein gültigen OAuth 2.0 Token mitliefern, sonst wird die Anfrage mit dem HTTP Status Code 401 "Unauthorized" abgelehnt.
+Das gilt auch für einen abgelaufenen Token.
+
+Zu Testzwecken kann ein Token bsp.weise mit curl vom SSO Provider bezogen werden :
+
+curl \
+-d "client_id=[client_id]" \
+-d "client_secret=[client_secret]" \
+-d "grant_type=client_credentials" \
+"https://..."
+
 # REST Schnittstelle
 Mit dem [Swagger Editor](https://editor.swagger.io) kann die komplette [Openapi REST Beschreibung](https://github.com/it-at-m/mobidam-s3-eai/blob/sprint/src/main/resources/openapi_rest_s3_v1.yaml) angezeigt werden.
 Der Workflow für den Import von Dateien in FME sieht folgende Schritt vor:
