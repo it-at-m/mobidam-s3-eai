@@ -3,6 +3,7 @@
 ## Sprint 9 (26.03.2024 - 16.04.2024)
 ### Hinzugefügt
 - Security Absicherung
+- Deployment
 
 ## Sprint 8 (05.03.2024 - 26.03.2024)
 ### Hinzugefügt
