@@ -6,6 +6,7 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.TestConstants;
 import de.muenchen.mobidam.rest.ErrorResponse;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 
 @CamelSpringBootTest
 @SpringBootTest(
@@ -26,6 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 )
 @EnableAutoConfiguration
 @DirtiesContext
+@ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
 class S3ServletContextPathNotFoundTest {
 
     @Produce
