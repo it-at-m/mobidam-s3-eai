@@ -42,7 +42,7 @@ public class SecurityConfiguration {
                         // allow access to /actuator/metrics for Prometheus monitoring in OpenShift
                         AntPathRequestMatcher.antMatcher("/actuator/metrics"))
                         .permitAll())
-                .authorizeHttpRequests((requests) -> requests.requestMatchers("/**")
+                .authorizeHttpRequests((requests) -> requests.requestMatchers(AntPathRequestMatcher.antMatcher("/**"))
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(withDefaults()))
