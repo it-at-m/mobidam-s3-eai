@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * The central class for configuration of all security aspects.
@@ -29,17 +30,17 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
 
         return http
-                .authorizeHttpRequests((requests) -> requests.requestMatchers("/**",
+                .authorizeHttpRequests((requests) -> requests.requestMatchers(AntPathRequestMatcher.antMatcher("/**"),
                         // allow access to /actuator/info
-                        "/actuator/info",
+                        AntPathRequestMatcher.antMatcher("/actuator/info"),
                         // allow access to /actuator/health for OpenShift Health Check
-                        "/actuator/health",
+                        AntPathRequestMatcher.antMatcher("/actuator/health"),
                         // allow access to /actuator/health/liveness for OpenShift Liveness Check
-                        "/actuator/health/liveness",
+                        AntPathRequestMatcher.antMatcher("/actuator/health/liveness"),
                         // allow access to /actuator/health/readiness for OpenShift Readiness Check
-                        "/actuator/health/readiness",
+                        AntPathRequestMatcher.antMatcher("/actuator/health/readiness"),
                         // allow access to /actuator/metrics for Prometheus monitoring in OpenShift
-                        "/actuator/metrics")
+                        AntPathRequestMatcher.antMatcher("/actuator/metrics"))
                         .permitAll())
                 .authorizeHttpRequests((requests) -> requests.requestMatchers("/**")
                         .authenticated())
