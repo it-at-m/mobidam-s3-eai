@@ -1,7 +1,6 @@
-# Sollte sich der Camel Main Thread nach dem Start wieder beenden, folgende Property aktivieren (http://camel.apache.org/spring-boot.html).
-# camel.springboot.main-run-controller=true
-
 # Spring-Boot Common-Application-Properties https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+
+debug: false
 
 management:
   endpoints:
@@ -10,14 +9,36 @@ management:
 spring:
   profiles:
     active: default
+  datasource:
+    url: jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS mdass3eai
 
-logging:
-  level:
-    org:
-      springframework: INFO
+
+server:
+  port: 8081
 
 camel:
   springboot:
     tracing: false
+  servlet:
+    mapping:
+      context-path: /api/*
+  component:
+    aws2-s3:
+      override-endpoint: http://127.0.0.1:8080
+      region: local
+  route:
+    common: direct:commonOperations
 
-output : mock:output
+mobidam:
+  archive:
+    expiration-months: 1
+  limit:
+    search:
+      items: 20
+  download:
+    expiration: 30
+  s3:
+    bucket-credential-config:
+      test-bucket:
+        access-key-env-var: FOO_ACCESS_KEY
+        secret-key-env-var: FOO_SECRET_KEY

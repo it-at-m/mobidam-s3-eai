@@ -1,15 +1,65 @@
 camel:
   springboot:
-#    Sollte sich der Camel Main Thread nach dem Start wieder beenden, folgende Property aktivieren (http://camel.apache.org/spring-boot.html).
     main-run-controller: true
     tracing: false
   servlet:
     mapping:
       context-path: /api/*
+  component:
+    aws2-s3:
+      override-endpoint: ...
+      region: ...
+  route:
+    common: direct:commonOperations
+
+mobidam:
+  archive:
+    expiration-months: 1
+  limit:
+    search:
+      items: 20
+  download:
+    expiration: 30
+  s3:
+    bucket-credential-config:
+      x-itmkm82k:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-mdasc-mdasdev:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
 
 spring:
   application:
     name: @project.artifactId@
+  datasource:
+    url: ...
+    username: ...
+    password: ...
+    driver-class-name: ...
+  jpa:
+    hibernate:
+      # always drop and create the db should be the best
+      # configuration for local (development) mode. this
+      # is also the default, that spring offers by convention.
+      # but here explicite:
+      ddl-auto: none
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    # Logging for database operation
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: ...
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${keycloak.auth-server-url}/realms/${realm}
+          jwk-set-uri: ${keycloak.auth-server-url}/realms/${realm}/protocol/openid-connect/certs
+
+realm: ...
+keycloak.auth-server-url: ...
 
 # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
 management:
@@ -34,10 +84,3 @@ info:
     name: @project.artifactId@
     version: @project.version@
 
-logging:
-  level:
-    org:
-      springframework: INFO
-
-#  https://camel.apache.org/components/next/index.html
-output: direct:foo
