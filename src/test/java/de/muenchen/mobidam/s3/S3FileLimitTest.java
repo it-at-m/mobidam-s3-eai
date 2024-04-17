@@ -8,6 +8,7 @@ import com.robothy.s3.rest.LocalS3;
 import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.TestConstants;
 import de.muenchen.mobidam.rest.BucketContentInner;
 import java.io.File;
 import java.net.URI;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -48,6 +50,7 @@ import software.amazon.awssdk.services.s3.model.*;
 )
 @EnableAutoConfiguration
 @DirtiesContext
+@ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
 class S3FileLimitTest {
 
     @Produce
