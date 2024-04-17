@@ -17,8 +17,16 @@ Die Enterprise Application Integration Komponente (EAI) bietet eine Webschnittst
 
 Github-Repo:  https://github.com/it-at-m/mobidam-s3-eai
 
-# Technisches Setup
-# S3
+## API
+
+| **API**            | **Beschreibung**                                              | **Parameter**                 |
+|--------------------|---------------------------------------------------------------|-------------------------------|
+| /api/filesInFolder | Auflisten aller Objekte im Bucket mit / ohne bestimmtem Path-Prefix | bucketName<br/>path           | 
+| /api/presignedUrl  | Erstellen einer vorsignierten Url für ein Objekt im Bucket    | bucketName<br/>objectName<br/>path |
+| /api/archive       | Archivieren eines Objektes im Bucket                          | bucketName<br/>objectName |
+
+## Technisches Setup
+## S3
 Unser LHM S3 ist eine Implementierung von [StorageGrid](https://docs.netapp.com/us-en/storagegrid-family/).
 
 Für das Projekt existiert ein S3 Tenant dem auf Antrag neue Buckets hinzugefügt werden können.
@@ -41,7 +49,7 @@ Das Profil erzeugt die Openapi Java Source Dateien im Maven _target_ Ordner.
 
 Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
 
-# REST Schnittstelle
+## REST Schnittstelle
 Mit dem [Swagger Editor](https://editor.swagger.io) kann die komplette [Openapi REST Beschreibung](https://github.com/it-at-m/mobidam-s3-eai/blob/sprint/src/main/resources/openapi_rest_s3_v1.yaml) angezeigt werden.
 Der Workflow für den Import von Dateien in FME sieht folgende Schritt vor:
 - Anzeigen von Inhalten eines S3 Buckets.
