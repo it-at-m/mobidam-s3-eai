@@ -5,6 +5,7 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
+import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
 import de.muenchen.mobidam.exception.MobidamException;
@@ -33,7 +34,12 @@ public class S3RouteBuilder extends RouteBuilder {
                 .handled(true)
                 .process(exchange -> {
                     var s3Exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, S3Exception.class);
-                    log.error("Error occurred in route", s3Exception);
+                    if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
+                        log.error(String.format("Archive clean up (%s)", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString()),
+                                s3Exception);
+                    } else {
+                        log.error("Error occurred in route", s3Exception);
+                    }
                     exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getClass().getName()));
                 });
 
@@ -41,7 +47,12 @@ public class S3RouteBuilder extends RouteBuilder {
                 .handled(true)
                 .process(exchange -> {
                     var s3Exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, ResolveEndpointFailedException.class);
-                    log.error("Error occurred in route", s3Exception);
+                    if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
+                        log.error(String.format("Archive clean up (%s)", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString()),
+                                s3Exception);
+                    } else {
+                        log.error("Error occurred in route", s3Exception);
+                    }
                     exchange.getMessage().setBody(ErrorResponseBuilder.build(400, s3Exception.getClass().getName()));
                 });
 
@@ -50,9 +61,19 @@ public class S3RouteBuilder extends RouteBuilder {
                 .process(exchange -> {
                     if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
                         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
+                        if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
+                            log.error(
+                                    String.format("Archive clean up (%s): %s", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString(),
+                                            res.getError()));
+                        }
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
-                        log.error("Error occurred in route", exception);
+                        if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
+                            log.error(String.format("Archive clean up (%s)", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString()),
+                                    exception);
+                        } else {
+                            log.error("Error occurred in route", exception);
+                        }
                         ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
@@ -100,6 +121,22 @@ public class S3RouteBuilder extends RouteBuilder {
                 .throwException(new MobidamException("REST ContextPath not found."))
                 .end()
                 .process("restResponseWrapper");
+
+        from("{{camel.route.delete-archive}}")
+                .routeId("Clean-up-archive").routeDescription("S3 Archive Clean Up")
+                .setHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, simple(Constants.ARCHIVE_ENTITY))
+                .to("bean:archiveService?method=expired")
+                .log(LoggingLevel.INFO, Constants.MOBIDAM_LOGGER, "Archive clean up started (${body.size} Item(s) found for processing) ...")
+                .split(body())
+                .setProperty(Constants.ARCHIVE_ENTITY, simple("${body}"))
+                .setHeader(Constants.PARAMETER_BUCKET_NAME, simple("${body.bucket}"))
+                .process("s3CredentialProvider")
+                .setHeader(AWS2S3Constants.KEY, simple("${body.path}"))
+                .toD(String.format(
+                        "aws2-s3://${header.%1$s}?accessKey=${header.%2$s}&secretKey=${header.%3$s}&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=deleteObject",
+                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY))
+                .setBody(simple(String.format("${exchangeProperty.%s}", Constants.ARCHIVE_ENTITY)))
+                .to("bean:archiveService?method=delete");
 
     }
 }

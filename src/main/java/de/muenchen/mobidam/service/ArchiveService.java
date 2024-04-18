@@ -2,6 +2,7 @@ package de.muenchen.mobidam.service;
 
 import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.repository.ArchiveRepository;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,14 @@ public class ArchiveService {
 
     public MobidamArchive save(MobidamArchive entity) {
         return archiveRepository.saveAndFlush(entity);
+    }
+
+    public Iterable<MobidamArchive> expired(MobidamArchive entity) {
+        return archiveRepository.findAllByExpirationBefore(LocalDate.now());
+    }
+
+    public void delete(MobidamArchive entity) {
+        archiveRepository.delete(entity);
     }
 
 }
