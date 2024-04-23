@@ -74,9 +74,6 @@ class S3ArchiveDeleteTest {
     @Value("${mobidam.archive.name:archive}")
     private String archive;
 
-    @Value("${mobidam.archive.expiration-months:1}")
-    private int expiration;
-
     @BeforeAll
     public static void setUp() throws URISyntaxException {
 
@@ -91,6 +88,10 @@ class S3ArchiveDeleteTest {
         s3InitClient = S3Client.builder().endpointOverride(new URI("http://127.0.0.1:8080")).region(Region.of("local"))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("foo", "foo"))).build();
 
+    }
+
+    @BeforeEach
+    public void cleanUp() {
         // Remove old test content
         var bucketsInTest = s3InitClient.listBuckets();
 
@@ -108,6 +109,9 @@ class S3ArchiveDeleteTest {
 
         // Create test bucket
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
+
+        // Reset database
+        archiveRepository.deleteAll();
     }
 
     @AfterAll
@@ -116,7 +120,6 @@ class S3ArchiveDeleteTest {
     }
 
     @Test
-    @Order(1)
     public void test_RouteWithArchiveDelete() {
 
         // Set S3 archive content
@@ -141,7 +144,6 @@ class S3ArchiveDeleteTest {
     }
 
     @Test()
-    @Order(2)
     public void test_RouteWithArchiveDeleteMobidamException() {
 
         // Set S3 archive content

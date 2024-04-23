@@ -16,7 +16,7 @@ public class ArchiveService {
         return archiveRepository.saveAndFlush(entity);
     }
 
-    public Iterable<MobidamArchive> expired(MobidamArchive entity) {
+    public Iterable<MobidamArchive> listExpired() {
         return archiveRepository.findAllByExpirationBefore(LocalDate.now());
     }
 
