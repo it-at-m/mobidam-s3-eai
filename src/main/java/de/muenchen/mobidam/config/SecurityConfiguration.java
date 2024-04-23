@@ -30,7 +30,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
 
         return http
-                .authorizeHttpRequests((requests) -> requests.requestMatchers(AntPathRequestMatcher.antMatcher("/**"),
+                .authorizeHttpRequests((requests) -> requests.requestMatchers(
                         // allow access to /actuator/info
                         AntPathRequestMatcher.antMatcher("/actuator/info"),
                         // allow access to /actuator/health for OpenShift Health Check
@@ -42,11 +42,11 @@ public class SecurityConfiguration {
                         // allow access to /actuator/metrics for Prometheus monitoring in OpenShift
                         AntPathRequestMatcher.antMatcher("/actuator/metrics"))
                         .permitAll())
-                .authorizeHttpRequests((requests) -> requests.requestMatchers(AntPathRequestMatcher.antMatcher("/**"))
+                .authorizeHttpRequests((requests) -> requests.requestMatchers(
+                        AntPathRequestMatcher.antMatcher("/**"))
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(withDefaults()))
                 .build();
-
     }
 }

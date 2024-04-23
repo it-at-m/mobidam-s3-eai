@@ -1,5 +1,9 @@
 # Release-Notes
 
+## Sprint 10 (16.04.2024 - 7.05.2024)
+### Hinzugefügt
+- Loeschkonzept
+
 ## Sprint 9 (26.03.2024 - 16.04.2024)
 ### Hinzugefügt
 - Security Absicherung

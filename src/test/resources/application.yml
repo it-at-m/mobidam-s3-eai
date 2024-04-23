@@ -28,6 +28,7 @@ camel:
       region: local
   route:
     common: direct:commonOperations
+    delete-archive: direct:deleteArchive
 
 mobidam:
   archive:

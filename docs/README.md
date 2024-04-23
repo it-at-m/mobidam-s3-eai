@@ -47,7 +47,10 @@ Um neue Openapi Java Source Dateien zu erstellen kann das Maven Profil _generate
 Das Profil erzeugt die Openapi Java Source Dateien im Maven _target_ Ordner.
 Änderungen und neue Features können in die Klassen im Package _de.muenchen.mobidam.rest_ kopiert werden.
 
-Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) bearbeitet werden.
+Die Openapi Quelle kann mit dem [Swagger Editor](https://editor.swagger.io) angezeigt und bearbeitet werden.
+- Dazu den Swagger Editor mit dem Link im Browser starten.
+- Die Openapi YAML aus [GitHub ...main/src/main/resources/openapi_rest_s3...yaml ](https://github.com/it-at-m/mobidam-s3-eai/blob/main/src/main/resources/) downloaden.
+- Die Openapi YAML im Browser mit dem Swagger Editor über die Menü Punkte *File/Import file* öffnen.
 
 ## Security
 Wird die EAI im Security Modus gestartet, muss der Aufrufer der REST Schnittstelle ein gültigen OAuth 2.0 Token mitliefern, sonst wird die Anfrage mit dem HTTP Status Code 401 "Unauthorized" abgelehnt.
@@ -83,6 +86,9 @@ Mit der Rest Ressource '/archive' lassen sich bereits in FME importierte Dateien
 Technisch ist das in S3 eine Erweiterung des Datei Pfads und Namens im S3 Bucket.
 Z.Bsp. : PUT '.../archive?bucketName=bucket1&objectName=Pfad1/Pfad2/Datei' wird innerhalb des 'bucket1' verschoben nach 'archive/Pfad1/Pfad2/Datei'.
 
+Für alle archivierten Dateien wird mit dem Verschieben in das '/archive' ein Datenbankeintrag mit einem Löschdatum erstellt.
+Anhand des Datenbankeintrags werden die archivierten Dateien nach einer Frist automatisch aus dem S3 Bucket wieder gelöscht.
+
 ### Anzeigen
 Mit der Rest Ressource GET '.../filesInFolder?bucketName=bucket1&path=...&archived=true' können die archivierten Dateien eines Pfades angezeigt werden.
 
@@ -106,3 +112,39 @@ MOBIDAM_BUCKET2_ACCESS_KEY=<my-access-key2>
 MOBIDAM_BUCKET2_SECRET_KEY=<my-secret-key2>
 ```
 
+# Archivierte Dateien aufräumen
+Alle im S3 archivierten Dateien werden nach einer Ablauffrist automatisch über ihren Datenbankeintrag selektiert und wieder gelöscht. 
+
+application.yaml:
+```
+mobidam:
+  archive:
+    expiration-months: 1
+```
+
+Die Löschzeitpunkte können konfiguriert werden.
+application.yaml:
+```
+camel:
+  route:
+    delete-archive: quartz://mobidam/archiveCleanUp?cron=0+30+2+?+*+*
+
+```
+
+## S3 EAI Datenbank
+Datenbankeintrag enthält Angaben zum
+- Bucket
+- Path/Objektname (z.Bsp. archive/Pfad1/Pfad2/Datei )
+- Erstelldatum des Eintrags
+- Ablaufdatum des Eintrags.
+
+application.yaml:
+```
+spring:
+  datasource:
+    url: ...
+    username: ...
+    password: ...
+    driver-class-name: ...
+
+```
