@@ -11,6 +11,7 @@ camel:
       region: ...
   route:
     common: direct:commonOperations
+    delete-archive: quartz://mobidam/archiveCleanUp?cron=0+30+2+?+*+*
 
 mobidam:
   archive:
@@ -26,6 +27,12 @@ mobidam:
         access-key-env-var: MOBIDAM_ACCESS_KEY
         secret-key-env-var: MOBIDAM_SECRET_KEY
       int-mdasc-mdasdev:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-mdask-lapas:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-mdask-kvutest:
         access-key-env-var: MOBIDAM_ACCESS_KEY
         secret-key-env-var: MOBIDAM_SECRET_KEY
 
@@ -51,6 +58,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: ...
+  quartz:
+    job-store-type: memory
   security:
     oauth2:
       resource-server:
