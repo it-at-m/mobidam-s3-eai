@@ -35,6 +35,12 @@ mobidam:
       int-mdask-kvutest:
         access-key-env-var: MOBIDAM_ACCESS_KEY
         secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-mdask-bau:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-pitprojektmdask-vespa:
+        access-key-env-var: MOBIDAM_PITPROJEKTMDASK_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_PITPROJEKTMDASK_SECRET_KEY
 
 spring:
   application:
