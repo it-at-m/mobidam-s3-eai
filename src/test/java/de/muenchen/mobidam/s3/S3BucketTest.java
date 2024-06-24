@@ -120,7 +120,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNotFound() {
+    public void test_RouteWithBucketNameNotFoundAndTenant() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
@@ -129,7 +129,7 @@ class S3BucketTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Configuration for bucket not found: foo", error.getError());
+        Assertions.assertEquals("Bucket not configured: foo", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), error.getStatus());
 
     }

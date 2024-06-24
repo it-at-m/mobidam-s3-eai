@@ -167,7 +167,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlBucketNotExist() {
+    public void test_RouteWithPresignedUrlBucketNotExistAndTenant() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),
@@ -181,7 +181,7 @@ class S3PresignedUrlTest {
         var response = producer.send("{{camel.route.common}}", s3Request);
 
         var error = response.getIn().getBody(ErrorResponse.class);
-        Assertions.assertEquals("Configuration for bucket not found: BucketNotExist", error.getError());
+        Assertions.assertEquals("Bucket not configured: BucketNotExist", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(500), error.getStatus());
 
     }
