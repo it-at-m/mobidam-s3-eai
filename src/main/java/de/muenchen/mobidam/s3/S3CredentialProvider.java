@@ -57,7 +57,8 @@ public class S3CredentialProvider implements Processor {
             envVars = tryTenantCredentials(map);
             if (envVars == null) {
                 exchange.getMessage()
-                        .setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Configuration for bucket and tenant not found: " + bucketName));
+                        .setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                "Configuration for bucket and tenant not found: " + bucketName));
                 throw new MobidamException("Configuration for bucket and tenant not found: " + bucketName);
             }
         }
