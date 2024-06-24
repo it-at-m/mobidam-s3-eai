@@ -234,7 +234,7 @@
         <dependency>
             <groupId>io.github.robothy</groupId>
             <artifactId>local-s3-rest</artifactId>
-            <version>1.10</version>
+            <version>1.15</version>
             <scope>test</scope>
         </dependency>
         <dependency>
