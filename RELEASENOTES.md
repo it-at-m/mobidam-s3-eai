@@ -1,6 +1,6 @@
 # Release-Notes
 
-## Sprint 13 (19.06.2024 - 09.06.2024)
+## Sprint 13 (19.06.2024 - 09.07.2024)
 ### Hinzugefügt
 - Tenant Credentials
 
