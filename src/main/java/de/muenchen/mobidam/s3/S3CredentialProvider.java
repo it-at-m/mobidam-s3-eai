@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class S3CredentialProvider implements Processor {
 
+    private static final String TENANT_CONFIG = "tenant-default";
+
     private final S3BucketCredentialConfig properties;
     private final EnvironmentReader environmentReader;
 
@@ -52,10 +54,17 @@ public class S3CredentialProvider implements Processor {
         Map<String, S3BucketCredentialConfig.BucketCredentialConfig> map = properties.getBucketCredentialConfig();
         S3BucketCredentialConfig.BucketCredentialConfig envVars = map.get(bucketName);
         if (envVars == null) {
-            exchange.getMessage()
-                    .setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Configuration for bucket not found: " + bucketName));
-            throw new MobidamException("Configuration for bucket not found: " + bucketName);
+            envVars = tryTenantCredentials(map);
+            if (envVars == null) {
+                exchange.getMessage()
+                        .setBody(ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Configuration for bucket and tenant not found: " + bucketName));
+                throw new MobidamException("Configuration for bucket and tenant not found: " + bucketName);
+            }
         }
         return envVars;
+    }
+
+    private S3BucketCredentialConfig.BucketCredentialConfig tryTenantCredentials(Map<String, S3BucketCredentialConfig.BucketCredentialConfig> propertiesMap) {
+        return propertiesMap.get(TENANT_CONFIG);
     }
 }
