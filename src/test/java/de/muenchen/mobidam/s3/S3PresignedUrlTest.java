@@ -167,7 +167,7 @@ class S3PresignedUrlTest {
     }
 
     @Test
-    public void test_RouteWithPresignedUrlBucketNotExistAndTenant() {
+    public void test_RouteWithPresignedUrlWithBucketAndTenantNotConfigured() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key("File_1.csv").build(),

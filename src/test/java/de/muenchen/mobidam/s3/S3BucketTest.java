@@ -120,7 +120,7 @@ class S3BucketTest {
     }
 
     @Test
-    public void test_RouteWithBucketNameNotFoundAndTenant() {
+    public void test_RouteWithBucketNameNotFoundAndTenantNotFound() {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
