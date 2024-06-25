@@ -1,5 +1,9 @@
 # Release-Notes
 
+## Sprint 13 (19.06.2024 - 09.07.2024)
+### Hinzugefügt
+- Tenant Credentials
+
 ## Sprint 10 (16.04.2024 - 7.05.2024)
 ### Hinzugefügt
 - Loeschkonzept

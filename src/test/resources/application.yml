@@ -40,6 +40,9 @@ mobidam:
     expiration: 30
   s3:
     bucket-credential-config:
+      tenant-default:
+        access-key-env-var: MOBIDAM_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_SECRET_KEY
       test-bucket:
         access-key-env-var: FOO_ACCESS_KEY
         secret-key-env-var: FOO_SECRET_KEY

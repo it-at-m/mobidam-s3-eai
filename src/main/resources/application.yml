@@ -23,18 +23,12 @@ mobidam:
     expiration: 30
   s3:
     bucket-credential-config:
-      x-itmkm82k:
+      tenant-default:
         access-key-env-var: MOBIDAM_ACCESS_KEY
         secret-key-env-var: MOBIDAM_SECRET_KEY
-      int-mdasc-mdasdev:
-        access-key-env-var: MOBIDAM_ACCESS_KEY
-        secret-key-env-var: MOBIDAM_SECRET_KEY
-      int-mdask-lapas:
-        access-key-env-var: MOBIDAM_ACCESS_KEY
-        secret-key-env-var: MOBIDAM_SECRET_KEY
-      int-mdask-kvutest:
-        access-key-env-var: MOBIDAM_ACCESS_KEY
-        secret-key-env-var: MOBIDAM_SECRET_KEY
+      int-pitprojektmdask-vespa:
+        access-key-env-var: MOBIDAM_PITPROJEKTMDASK_ACCESS_KEY
+        secret-key-env-var: MOBIDAM_PITPROJEKTMDASK_SECRET_KEY
 
 spring:
   application:
