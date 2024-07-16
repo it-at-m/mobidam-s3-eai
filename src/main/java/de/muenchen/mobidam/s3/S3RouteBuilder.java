@@ -55,6 +55,8 @@ public class S3RouteBuilder extends RouteBuilder {
                             log.error(
                                     String.format("Archive clean up (%s): %s", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString(),
                                             res.getError()));
+                        } else {
+                            log.error(exchange.getIn().getBody().toString());
                         }
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
