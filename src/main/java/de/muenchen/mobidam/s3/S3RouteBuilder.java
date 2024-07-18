@@ -48,8 +48,7 @@ public class S3RouteBuilder extends RouteBuilder {
                             if (exception.getCause() instanceof S3Exception) {
                                 var cause = (S3Exception) exception.getCause();
                                 exchange.getMessage().setBody(ErrorResponseBuilder.build(cause.statusCode(), cause.getClass().getName()));
-                            }
-                            else
+                            } else
                                 exchange.getMessage().setBody(ErrorResponseBuilder.build(400, exception.getClass().getName()));
                         }
                     }
@@ -58,7 +57,7 @@ public class S3RouteBuilder extends RouteBuilder {
         onException(Exception.class)
                 .handled(true)
                 .process(exchange -> {
-                    if (exchange.getMessage().getBody() instanceof ErrorResponse res) {
+                    if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
                         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
                         if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
                             logException(exchange, res);
