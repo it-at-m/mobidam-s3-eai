@@ -34,7 +34,7 @@ public class S3RouteBuilder extends RouteBuilder {
                 .handled(true)
                 .process(exchange -> {
                     var s3Exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, S3Exception.class);
-                    logException(exchange, s3Exception);
+                    logException(exchange, s3Exception.getMessage());
                     exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getClass().getName()));
                 });
 
@@ -42,7 +42,7 @@ public class S3RouteBuilder extends RouteBuilder {
                 .handled(true)
                 .process(exchange -> {
                     var s3Exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, ResolveEndpointFailedException.class);
-                    logException(exchange, s3Exception);
+                    logException(exchange, s3Exception.getMessage());
                     exchange.getMessage().setBody(ErrorResponseBuilder.build(400, s3Exception.getClass().getName()));
                 });
 
@@ -52,15 +52,11 @@ public class S3RouteBuilder extends RouteBuilder {
                     if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
                         exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
                         if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
-                            log.error(
-                                    String.format("Archive clean up (%s): %s", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString(),
-                                            res.getError()));
-                        } else {
-                            log.error(exchange.getIn().getBody().toString());
+                            logException(exchange, res.getError());
                         }
                     } else {
                         Throwable exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
-                        logException(exchange, exception);
+                        logException(exchange, exception.getMessage());
                         ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
@@ -127,12 +123,13 @@ public class S3RouteBuilder extends RouteBuilder {
 
     }
 
-    private void logException(Exchange exchange, Throwable exception) {
+    private void logException(Exchange exchange, String errorMessage) {
         if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
-            log.error(String.format("Archive clean up (%s)", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString()),
-                    exception);
+            log.error(
+                    String.format("Archive clean up (%s): %s", exchange.getProperty(Constants.ARCHIVE_ENTITY, MobidamArchive.class).toString(), errorMessage));
         } else {
-            log.error("Error occurred in route", exception);
+            log.error("Error occurred in route with message '{}'.", errorMessage);
         }
     }
+
 }
