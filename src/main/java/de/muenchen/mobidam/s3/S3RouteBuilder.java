@@ -13,7 +13,6 @@ import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.ResolveEndpointFailedException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
@@ -30,44 +29,33 @@ public class S3RouteBuilder extends RouteBuilder {
 
         errorHandler(deadLetterChannel(ExceptionRouteBuilder.EXCEPTION_HANDLING).useOriginalMessage());
 
-        onException(S3Exception.class, ResolveEndpointFailedException.class)
+        onException(S3Exception.class)
                 .handled(true)
                 .process(exchange -> {
-                    if (exchange.getException() instanceof S3Exception) {
-                        var s3Exception = exchange.getException(S3Exception.class);
-                        logException(exchange, s3Exception);
-                        exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getClass().getName()));
-                    } else {
-                        Exception exception = (Exception) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
-                        if (exception instanceof S3Exception) {
-                            var s3Exception = (S3Exception) exception;
-                            logException(exchange, exception);
-                            exchange.getMessage().setBody(ErrorResponseBuilder.build(s3Exception.statusCode(), s3Exception.getClass().getName()));
-                        } else {
-                            logException(exchange, exception);
-                            if (exception.getCause() instanceof S3Exception) {
-                                var cause = (S3Exception) exception.getCause();
-                                exchange.getMessage().setBody(ErrorResponseBuilder.build(cause.statusCode(), cause.getClass().getName()));
-                            } else
-                                exchange.getMessage().setBody(ErrorResponseBuilder.build(400, exception.getClass().getName()));
-                        }
+                    Exception exception = (Exception) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
+                    // even with onException(S3Exception), the transported exception may still be sth. else:
+                    if (((Throwable)exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT)).getCause() instanceof S3Exception s3Exception){
+                        exception = s3Exception;
                     }
+                    logException(exchange, exception);
+                    var statusCode = HttpStatus.BAD_REQUEST.value();
+                    if (exception instanceof S3Exception s3Exception){
+                        statusCode = s3Exception.statusCode();
+                    }
+                    exchange.getMessage().setBody(ErrorResponseBuilder.build(statusCode, exception.getClass().getName()));
+                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
                 });
 
         onException(Exception.class)
                 .handled(true)
                 .process(exchange -> {
-                    if (exchange.getMessage().getBody()instanceof ErrorResponse res) {
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, res.getStatus());
-                        if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
-                            logException(exchange, res);
-                        }
-                    } else {
-                        Throwable exception = (Throwable) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
-                        logException(exchange, exception);
+                    Throwable exception = (Throwable) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
+                    logException(exchange, exception);
+                    if (!(exchange.getMessage().getBody() instanceof ErrorResponse)) {
                         ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
+                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((ErrorResponse)exchange.getMessage().getBody()).getStatus());
                 });
 
         from("{{camel.route.common}}")
@@ -131,15 +119,10 @@ public class S3RouteBuilder extends RouteBuilder {
 
     }
 
-    private void logException(Exchange exchange, ErrorResponse res) {
-        log.error(getFormattedArchiveException(exchange, res.getError()));
-    }
-
     private void logException(Exchange exchange, Throwable exception) {
+        log.error("Error occurred in route", exception);
         if (exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH).equals(Constants.ARCHIVE_ENTITY)) {
             log.error(getFormattedArchiveException(exchange, exception.getMessage()));
-        } else {
-            log.error("Error occurred in route", exception);
         }
     }
 
