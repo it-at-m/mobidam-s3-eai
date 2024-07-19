@@ -34,12 +34,12 @@ public class S3RouteBuilder extends RouteBuilder {
                 .process(exchange -> {
                     Exception exception = (Exception) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
                     // even with onException(S3Exception), the transported exception may still be sth. else:
-                    if (((Throwable)exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT)).getCause() instanceof S3Exception s3Exception){
+                    if (((Throwable) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT)).getCause()instanceof S3Exception s3Exception) {
                         exception = s3Exception;
                     }
                     logException(exchange, exception);
                     var statusCode = HttpStatus.BAD_REQUEST.value();
-                    if (exception instanceof S3Exception s3Exception){
+                    if (exception instanceof S3Exception s3Exception) {
                         statusCode = s3Exception.statusCode();
                     }
                     exchange.getMessage().setBody(ErrorResponseBuilder.build(statusCode, exception.getClass().getName()));
@@ -55,7 +55,7 @@ public class S3RouteBuilder extends RouteBuilder {
                         ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
                         exchange.getMessage().setBody(res);
                     }
-                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((ErrorResponse)exchange.getMessage().getBody()).getStatus());
+                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((ErrorResponse) exchange.getMessage().getBody()).getStatus());
                 });
 
         from("{{camel.route.common}}")
