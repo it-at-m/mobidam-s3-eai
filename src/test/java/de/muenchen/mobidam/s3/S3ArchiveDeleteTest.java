@@ -48,7 +48,6 @@ import java.time.LocalDate;
 )
 @EnableAutoConfiguration
 @DirtiesContext
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
 class S3ArchiveDeleteTest {
 
