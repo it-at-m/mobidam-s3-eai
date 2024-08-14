@@ -1,4 +1,7 @@
 # Release-Notes
+## Sprint 15 (30.07.2024 - 20.08.2024)
+### Entfernt
+- Demo Umgebung
 
 ## Sprint 13 (19.06.2024 - 09.07.2024)
 ### Hinzugefügt
