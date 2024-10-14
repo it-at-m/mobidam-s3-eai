@@ -1,10 +1,10 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
 import de.muenchen.mobidam.rest.BucketContentInner;
-import de.muenchen.mobidam.rest.ErrorResponse;
 import de.muenchen.mobidam.rest.PresignedUrl;
 import java.math.BigDecimal;
 import java.util.ArrayList;

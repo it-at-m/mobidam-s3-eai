@@ -6,10 +6,11 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
-import de.muenchen.mobidam.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
-import de.muenchen.mobidam.exception.MobidamException;
-import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -72,7 +73,7 @@ public class S3RouteBuilder extends RouteBuilder {
                 .simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=${header.%4$s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&${header.%5$s}",
-                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION,
+                        S3Constants.PARAMETER_BUCKET_NAME, S3Constants.ACCESS_KEY, S3Constants.SECRET_KEY, AWS2S3Constants.S3_OPERATION,
                         Constants.PARAMETER_ARCHIVED))
                 /*
                  * ServletContext path : /presignedUrl
@@ -80,17 +81,17 @@ public class S3RouteBuilder extends RouteBuilder {
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=%4$s",
-                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
+                        S3Constants.PARAMETER_BUCKET_NAME, S3Constants.ACCESS_KEY, S3Constants.SECRET_KEY, AWS2S3Operations.createDownloadLink))
                 /*
                  * ServletContext path : /archive
                  */
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
-                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.copyObject))
+                        S3Constants.PARAMETER_BUCKET_NAME, S3Constants.ACCESS_KEY, S3Constants.SECRET_KEY, AWS2S3Operations.copyObject))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
-                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY, AWS2S3Operations.deleteObject))
+                        S3Constants.PARAMETER_BUCKET_NAME, S3Constants.ACCESS_KEY, S3Constants.SECRET_KEY, AWS2S3Operations.deleteObject))
                 .setBody(simple(String.format("${exchangeProperty.%s}", Constants.ARCHIVE_ENTITY)))
                 .to("bean:archiveService?method=save")
                 /*
@@ -108,12 +109,12 @@ public class S3RouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO, Constants.MOBIDAM_LOGGER, "Archive clean up started (${body.size} Item(s) found for processing) ...")
                 .split(body())
                 .setProperty(Constants.ARCHIVE_ENTITY, simple("${body}"))
-                .setHeader(Constants.PARAMETER_BUCKET_NAME, simple("${body.bucket}"))
+                .setHeader(S3Constants.PARAMETER_BUCKET_NAME, simple("${body.bucket}"))
                 .process("s3CredentialProvider")
                 .setHeader(AWS2S3Constants.KEY, simple("${body.path}"))
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&operation=deleteObject",
-                        Constants.PARAMETER_BUCKET_NAME, Constants.ACCESS_KEY, Constants.SECRET_KEY))
+                        S3Constants.PARAMETER_BUCKET_NAME, S3Constants.ACCESS_KEY, S3Constants.SECRET_KEY))
                 .setBody(simple(String.format("${exchangeProperty.%s}", Constants.ARCHIVE_ENTITY)))
                 .to("bean:archiveService?method=delete");
 

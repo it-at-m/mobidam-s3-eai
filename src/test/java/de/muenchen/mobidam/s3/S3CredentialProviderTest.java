@@ -1,9 +1,10 @@
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.config.EnvironmentReader;
-import de.muenchen.mobidam.config.S3BucketCredentialConfig;
-import de.muenchen.mobidam.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.config.EnvironmentReader;
+import de.muenchen.mobidam.eai.common.config.S3BucketCredentialConfig;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.s3.S3CredentialProvider;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -38,14 +39,14 @@ public class S3CredentialProviderTest {
         String value = "BAR";
         configureEnvironment(bucketName, envVar, value);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, bucketName);
+        exchange.getMessage().setHeader(S3Constants.PARAMETER_BUCKET_NAME, bucketName);
 
         // When
         s3CredentialProvider.process(exchange);
 
         // Then
-        Assertions.assertEquals(value, exchange.getMessage().getHeader(Constants.ACCESS_KEY));
-        Assertions.assertEquals(value, exchange.getMessage().getHeader(Constants.SECRET_KEY));
+        Assertions.assertEquals(value, exchange.getMessage().getHeader(S3Constants.ACCESS_KEY));
+        Assertions.assertEquals(value, exchange.getMessage().getHeader(S3Constants.SECRET_KEY));
     }
 
     @Test
@@ -57,7 +58,7 @@ public class S3CredentialProviderTest {
         configureEnvironment(bucketName, envVar, value);
         Mockito.when(environmentReader.getEnvironmentVariable(Mockito.anyString())).thenReturn(null);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, bucketName);
+        exchange.getMessage().setHeader(S3Constants.PARAMETER_BUCKET_NAME, bucketName);
 
         // Then
         Assertions.assertThrows(MobidamException.class, () -> {
@@ -74,7 +75,7 @@ public class S3CredentialProviderTest {
         String value = "BAR";
         configureEnvironment(bucketName, envVar, value);
         Exchange exchange = new DefaultExchange(camelContext);
-        exchange.getMessage().setHeader(Constants.PARAMETER_BUCKET_NAME, "invalid_bucket");
+        exchange.getMessage().setHeader(S3Constants.PARAMETER_BUCKET_NAME, "invalid_bucket");
 
         // Then
         Assertions.assertThrows(MobidamException.class, () -> {

@@ -9,10 +9,13 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.rest.ErrorResponse;
+
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -42,7 +45,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
-                "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder,"
+                "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder,"
         }
 )
 @TestPropertySource(
@@ -124,7 +127,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, "foo")
+                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, "foo")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -139,7 +142,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, null)
+                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, null)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
@@ -153,7 +156,7 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, "")
+                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, "")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

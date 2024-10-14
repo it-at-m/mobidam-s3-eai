@@ -13,14 +13,7 @@ camel:
     common: direct:commonOperations
     delete-archive: quartz://mobidam/archiveCleanUp?cron=0+30+2+?+*+*
 
-mobidam:
-  archive:
-    expiration-months: 1
-  limit:
-    search:
-      items: 20
-  download:
-    expiration: 30
+de.muenchen.mobidam:
   s3:
     bucket-credential-config:
       tenant-default:
@@ -29,6 +22,13 @@ mobidam:
       int-pitprojektmdask-vespa:
         access-key-env-var: MOBIDAM_PITPROJEKTMDASK_ACCESS_KEY
         secret-key-env-var: MOBIDAM_PITPROJEKTMDASK_SECRET_KEY
+  archive:
+    expiration-months: 1
+  limit:
+    search:
+      items: 20
+  download:
+    expiration: 30
 
 spring:
   application:

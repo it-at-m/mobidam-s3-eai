@@ -30,14 +30,7 @@ camel:
     common: direct:commonOperations
     delete-archive: direct:deleteArchive
 
-mobidam:
-  archive:
-    expiration-months: 1
-  limit:
-    search:
-      items: 20
-  download:
-    expiration: 30
+de.muenchen.mobidam:
   s3:
     bucket-credential-config:
       tenant-default:
@@ -46,3 +39,10 @@ mobidam:
       test-bucket:
         access-key-env-var: FOO_ACCESS_KEY
         secret-key-env-var: FOO_SECRET_KEY
+  archive:
+    expiration-months: 1
+  limit:
+    search:
+      items: 20
+  download:
+    expiration: 30
