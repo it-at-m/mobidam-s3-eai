@@ -18,7 +18,7 @@ mobidam:
     expiration-months: 1
   limit:
     search:
-      items: 240
+      items: 2000
   download:
     expiration: 30
   s3:
