@@ -240,7 +240,7 @@
         <dependency>
             <groupId>io.github.robothy</groupId>
             <artifactId>local-s3-jupiter</artifactId>
-            <version>1.10</version>
+            <version>1.18</version>
             <scope>test</scope>
         </dependency>
 
