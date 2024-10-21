@@ -2,9 +2,10 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
-import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import de.muenchen.mobidam.rest.ErrorResponse;
 import de.muenchen.mobidam.rest.PresignedUrl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class RestResponseWrapper implements Processor {
             exchange.getMessage().setBody(null);
             break;
         default:
-            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
+            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath, new ErrorResponse()));
         }
 
     }
@@ -70,7 +71,7 @@ public class RestResponseWrapper implements Processor {
         var links = exchange.getIn().getBody(Collection.class);
 
         if (links.isEmpty()) {
-            ErrorResponse res = ErrorResponseBuilder.build(500, "Empty S3 url file list");
+            var res = ErrorResponseBuilder.build(500, "Empty S3 url file list", new ErrorResponse());
             exchange.getMessage().setBody(res);
             throw new MobidamException("Empty S3 url file list");
         } else {

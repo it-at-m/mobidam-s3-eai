@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +37,9 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @CamelSpringBootTest
 @SpringBootTest(
@@ -45,10 +49,9 @@ import software.amazon.awssdk.services.s3.model.*;
 @TestPropertySource(
         properties = {
                 "mobidam.limit.search.items=1",
-                "FOO_ACCESS_KEY=foo",
-                "FOO_SECRET_KEY=bar"
         }
 )
+@ExtendWith(SystemStubsExtension.class)
 @EnableAutoConfiguration
 @DirtiesContext
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
@@ -65,6 +68,9 @@ class S3FileLimitTest {
     private static S3Client s3InitClient;
 
     private static final String TEST_BUCKET = "test-bucket";
+
+    @SystemStub
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {

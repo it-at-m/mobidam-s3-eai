@@ -16,18 +16,21 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.io.File;
 import java.net.URI;
@@ -40,12 +43,7 @@ import java.time.LocalDate;
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
-@TestPropertySource(
-        properties = {
-                "FOO_ACCESS_KEY=foo",
-                "FOO_SECRET_KEY=bar"
-        }
-)
+@ExtendWith(SystemStubsExtension.class)
 @EnableAutoConfiguration
 @DirtiesContext
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
@@ -69,6 +67,9 @@ class S3ArchiveDeleteTest {
     private static final String OBJECT_KEY = "File_1.csv";
 
     private static final String PATH = "sub1/sub2/";
+
+    @SystemStub
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
 
     @Value("${mobidam.archive.name:archive}")
     private String archive;

@@ -8,9 +8,11 @@ import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.eai.common.S3Constants;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
-import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
+import de.muenchen.mobidam.eai.common.s3.S3CredentialProvider;
 import de.muenchen.mobidam.exception.ExceptionRouteBuilder;
+import de.muenchen.mobidam.rest.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
@@ -24,6 +26,8 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @Component
 @RequiredArgsConstructor
 public class S3RouteBuilder extends RouteBuilder {
+
+    final S3CredentialProvider s3CredentialProvider;
 
     @Override
     public void configure() {
@@ -43,7 +47,7 @@ public class S3RouteBuilder extends RouteBuilder {
                     if (exception instanceof S3Exception s3Exception) {
                         statusCode = s3Exception.statusCode();
                     }
-                    exchange.getMessage().setBody(ErrorResponseBuilder.build(statusCode, exception.getClass().getName()));
+                    exchange.getMessage().setBody(ErrorResponseBuilder.build(statusCode, exception.getClass().getName(), new ErrorResponse()));
                     exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
                 });
 
@@ -52,16 +56,17 @@ public class S3RouteBuilder extends RouteBuilder {
                 .process(exchange -> {
                     Throwable exception = (Throwable) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
                     logException(exchange, exception);
-                    if (!(exchange.getMessage().getBody() instanceof ErrorResponse)) {
-                        ErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
+                    if (!(exchange.getMessage().getBody() instanceof IErrorResponse)) {
+                        IErrorResponse res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName(), new ErrorResponse());
                         exchange.getMessage().setBody(res);
                     }
-                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((ErrorResponse) exchange.getMessage().getBody()).getStatus());
+                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((IErrorResponse) exchange.getMessage().getBody()).getStatus());
                 });
 
         from("{{camel.route.common}}")
                 .routeId("S3-Operation-Common").routeDescription("S3 Operation Handling")
                 .log(LoggingLevel.DEBUG, Constants.MOBIDAM_LOGGER, "Message received ${header.CamelHttpUrl}")
+                .setProperty(S3Constants.ERROR_RESPONSE).constant(new ErrorResponse())
                 .process("s3OperationWrapper")
                 .log(String.format("CamelServletContextPath: ${header.%s}", Constants.CAMEL_SERVLET_CONTEXT_PATH))
                 .process("s3CredentialProvider")
@@ -105,6 +110,7 @@ public class S3RouteBuilder extends RouteBuilder {
         from("{{camel.route.delete-archive}}")
                 .routeId("Clean-up-archive").routeDescription("S3 Archive Clean Up")
                 .setHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, simple(Constants.ARCHIVE_ENTITY))
+                .setProperty(S3Constants.ERROR_RESPONSE).constant(new ErrorResponse())
                 .to("bean:archiveService?method=listExpired")
                 .log(LoggingLevel.INFO, Constants.MOBIDAM_LOGGER, "Archive clean up started (${body.size} Item(s) found for processing) ...")
                 .split(body())

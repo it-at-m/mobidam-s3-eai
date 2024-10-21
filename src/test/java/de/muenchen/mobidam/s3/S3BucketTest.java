@@ -15,7 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import de.muenchen.mobidam.eai.common.S3Constants;
-import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
+import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,9 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @CamelSpringBootTest
 @SpringBootTest(
@@ -48,12 +52,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
                 "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder,"
         }
 )
-@TestPropertySource(
-        properties = {
-                "FOO_ACCESS_KEY=foo",
-                "FOO_SECRET_KEY=bar"
-        }
-)
+@ExtendWith(SystemStubsExtension.class)
 @EnableAutoConfiguration
 @DirtiesContext
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
@@ -70,6 +69,9 @@ class S3BucketTest {
     private static S3Client s3InitClient;
 
     private static final String TEST_BUCKET = "test-bucket";
+
+    @SystemStub
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -117,7 +119,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
@@ -131,7 +133,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket not configured: foo", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), error.getStatus());
 
@@ -146,7 +148,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
@@ -160,7 +162,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }

@@ -10,7 +10,7 @@ import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
 import de.muenchen.mobidam.eai.common.S3Constants;
-import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
+import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
 import de.muenchen.mobidam.rest.PresignedUrl;
 import java.io.File;
 import java.math.BigDecimal;
@@ -26,6 +26,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,18 +38,16 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = { "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
 )
-@TestPropertySource(
-        properties = {
-                "FOO_ACCESS_KEY=foo",
-                "FOO_SECRET_KEY=bar"
-        }
-)
+@ExtendWith(SystemStubsExtension.class)
 @EnableAutoConfiguration
 @DirtiesContext
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
@@ -66,6 +65,9 @@ class S3PresignedUrlTest {
 
     // Same as camel.component.aws2-s3.bucket
     private static final String TEST_BUCKET = "test-bucket";
+
+    @SystemStub
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -181,7 +183,7 @@ class S3PresignedUrlTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket not configured: BucketNotExist", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(500), error.getStatus());
 
@@ -196,7 +198,7 @@ class S3PresignedUrlTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Object name is empty", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
 
@@ -211,7 +213,7 @@ class S3PresignedUrlTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(400), error.getStatus());
 

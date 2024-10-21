@@ -8,7 +8,8 @@ import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
 import de.muenchen.mobidam.eai.common.S3Constants;
-import de.muenchen.mobidam.eai.common.rest.ErrorResponse;
+
+import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -49,7 +50,7 @@ class S3ServletContextPathNotFoundTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(IErrorResponse.class);
         Assertions.assertEquals("REST ContextPath not found : NotFound", error.getError());
 
     }
