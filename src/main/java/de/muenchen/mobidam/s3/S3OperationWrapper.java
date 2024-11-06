@@ -2,15 +2,11 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
-
+import de.muenchen.mobidam.eai.common.CommonConstants;
+import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import java.time.Duration;
 import java.time.LocalDate;
-
-import de.muenchen.mobidam.eai.common.S3Constants;
-import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
-import de.muenchen.mobidam.eai.common.exception.MobidamException;
-import de.muenchen.mobidam.rest.ErrorResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -34,7 +30,7 @@ public class S3OperationWrapper implements Processor {
     public void process(Exchange exchange) throws Exception {
 
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
-        var bucketName = exchange.getIn().getHeader(S3Constants.PARAMETER_BUCKET_NAME, String.class);
+        var bucketName = exchange.getIn().getHeader(CommonConstants.HEADER_BUCKET_NAME, String.class);
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
@@ -46,7 +42,7 @@ public class S3OperationWrapper implements Processor {
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                var res = ErrorResponseBuilder.build(400, "Object name is empty", new ErrorResponse());
+                var res = ErrorResponseBuilder.build(400, "Object name is empty");
                 exchange.getMessage().setBody(res);
                 throw new MobidamException("Object name is empty");
             }
@@ -69,7 +65,7 @@ public class S3OperationWrapper implements Processor {
 
             objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                var res = ErrorResponseBuilder.build(400, "Object name is empty", new ErrorResponse());
+                var res = ErrorResponseBuilder.build(400, "Object name is empty");
                 exchange.getMessage().setBody(res);
                 throw new MobidamException("Object name is empty");
             }
@@ -88,7 +84,7 @@ public class S3OperationWrapper implements Processor {
             break;
 
         default:
-            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath, new ErrorResponse()));
+            exchange.getMessage().setBody(ErrorResponseBuilder.build(HttpStatus.NOT_FOUND.value(), "REST ContextPath not found : " + contextPath));
             throw new MobidamException("REST ContextPath not found : " + contextPath);
         }
     }

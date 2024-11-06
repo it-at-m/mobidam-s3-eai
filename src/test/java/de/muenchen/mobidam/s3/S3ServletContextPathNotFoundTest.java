@@ -7,9 +7,8 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.eai.common.S3Constants;
-
-import de.muenchen.mobidam.eai.common.exception.IErrorResponse;
+import de.muenchen.mobidam.eai.common.CommonConstants;
+import de.muenchen.mobidam.eai.common.exception.CommonError;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -46,11 +45,11 @@ class S3ServletContextPathNotFoundTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, "NotFound")
-                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(IErrorResponse.class);
+        var error = response.getIn().getBody(CommonError.class);
         Assertions.assertEquals("REST ContextPath not found : NotFound", error.getError());
 
     }

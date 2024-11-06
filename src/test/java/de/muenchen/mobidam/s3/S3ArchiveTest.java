@@ -9,7 +9,7 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.CommonConstants;
 import de.muenchen.mobidam.repository.ArchiveRepository;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
@@ -79,7 +79,7 @@ class S3ArchiveTest {
     private int expiration;
 
     @SystemStub
-    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY", "bar");
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -128,7 +128,7 @@ class S3ArchiveTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
-                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
                 .withHeader(Constants.PARAMETER_OBJECT_NAME, PATH + OBJECT_KEY)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);

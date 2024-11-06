@@ -9,7 +9,7 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.CommonConstants;
 import de.muenchen.mobidam.rest.BucketContentInner;
 import java.io.File;
 import java.net.URI;
@@ -65,7 +65,7 @@ class S3ObjectTest {
     private static final String TEST_BUCKET = "test-bucket";
 
     @SystemStub
-    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY", "bar");
 
     @BeforeAll
     public static void setUp() throws URISyntaxException {
@@ -114,7 +114,7 @@ class S3ObjectTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(S3Constants.PARAMETER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 

@@ -69,7 +69,7 @@ class S3ArchiveDeleteTest {
     private static final String PATH = "sub1/sub2/";
 
     @SystemStub
-    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY" , "bar");
+    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY", "bar");
 
     @Value("${mobidam.archive.name:archive}")
     private String archive;

@@ -7,7 +7,7 @@ package de.muenchen.mobidam.rest;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.eai.common.S3Constants;
+import de.muenchen.mobidam.eai.common.CommonConstants;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -46,7 +46,7 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertNull(exchange.getMessage().getHeader(S3Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
@@ -60,7 +60,7 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("", exchange.getMessage().getHeader(S3Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
@@ -74,7 +74,7 @@ class S3ApiArchiveTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(S3Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_OBJECT_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_PATH));
         Assertions.assertEquals("/archive", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
