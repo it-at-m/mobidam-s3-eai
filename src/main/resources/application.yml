@@ -27,7 +27,7 @@ de.muenchen.mobidam:
     expiration-months: 1
   limit:
     search:
-      items: 20
+      items: 2000
   download:
     expiration: 30
 
