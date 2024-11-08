@@ -386,6 +386,7 @@
                 </dependencies>
                 <configuration>
                     <java>
+                        <toggleOffOn />
                         <includes>
                             <include>src/main/java/**/*.java</include> <!-- Check application code -->
                             <include>src/test/java/**/*.java</include> <!-- Check application tests code -->
