@@ -1,4 +1,9 @@
 # Release-Notes
+
+## Sprint 20 (13.11.2024 - 03.12.2024)
+### Entfernt
+- Vespa Bucket Credentials entfernt
+
 ## Sprint 15 (30.07.2024 - 20.08.2024)
 ### Entfernt
 - Demo Umgebung
