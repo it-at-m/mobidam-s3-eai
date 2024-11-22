@@ -3,6 +3,7 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.eai.common.CommonConstants;
+import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import java.time.Duration;
@@ -42,8 +43,8 @@ public class S3OperationWrapper implements Processor {
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                var res = ErrorResponseBuilder.build(400, "Object name is empty");
-                exchange.getMessage().setBody(res);
+                CommonError error = ErrorResponseBuilder.build(400, "Object name is empty");
+                exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
 
@@ -65,8 +66,8 @@ public class S3OperationWrapper implements Processor {
 
             objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                var res = ErrorResponseBuilder.build(400, "Object name is empty");
-                exchange.getMessage().setBody(res);
+                CommonError error = ErrorResponseBuilder.build(400, "Object name is empty");
+                exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
 

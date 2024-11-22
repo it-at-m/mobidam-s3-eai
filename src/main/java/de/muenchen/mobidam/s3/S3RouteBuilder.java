@@ -56,10 +56,10 @@ public class S3RouteBuilder extends RouteBuilder {
                     Throwable exception = (Throwable) exchange.getAllProperties().get(Exchange.EXCEPTION_CAUGHT);
                     logException(exchange, exception);
                     if (!(exchange.getMessage().getBody() instanceof CommonError)) {
-                        var res = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
-                        exchange.getMessage().setBody(res);
+                        CommonError error = ErrorResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getClass().getName());
+                        exchange.getMessage().setBody(error);
                     }
-                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, ((CommonError) exchange.getMessage().getBody()).getStatus());
+                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, exchange.getMessage().getBody(CommonError.class).getStatus());
                 });
 
         from("{{camel.route.common}}")
