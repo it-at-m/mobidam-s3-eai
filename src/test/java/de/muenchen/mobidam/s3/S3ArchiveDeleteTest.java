@@ -9,18 +9,25 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.TestConstants;
 import de.muenchen.mobidam.domain.MobidamArchive;
+import de.muenchen.mobidam.eai.common.config.EnvironmentReader;
 import de.muenchen.mobidam.repository.ArchiveRepository;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -28,22 +35,12 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
-import uk.org.webcompere.systemstubs.jupiter.SystemStub;
-import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.time.LocalDate;
 
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," }
+        properties = { "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," } // In the test only start included routes
 )
-@ExtendWith(SystemStubsExtension.class)
 @EnableAutoConfiguration
 @DirtiesContext
 @ActiveProfiles(TestConstants.SPRING_NO_SECURITY_PROFILE)
@@ -58,6 +55,9 @@ class S3ArchiveDeleteTest {
     @Autowired
     private ArchiveRepository archiveRepository;
 
+    @MockBean
+    private EnvironmentReader environmentReader;
+
     private static LocalS3 localS3;
 
     private static S3Client s3InitClient;
@@ -67,9 +67,6 @@ class S3ArchiveDeleteTest {
     private static final String OBJECT_KEY = "File_1.csv";
 
     private static final String PATH = "sub1/sub2/";
-
-    @SystemStub
-    private EnvironmentVariables environment = new EnvironmentVariables("FOO_ACCESS_KEY", "foo", "FOO_SECRET_KEY", "bar");
 
     @Value("${mobidam.archive.name:archive}")
     private String archive;
@@ -112,6 +109,7 @@ class S3ArchiveDeleteTest {
 
         // Reset database
         archiveRepository.deleteAll();
+
     }
 
     @AfterAll
@@ -134,7 +132,10 @@ class S3ArchiveDeleteTest {
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(archiveFile1.getPath()).build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
-        var response = producer.send("{{camel.route.delete-archive}}", ExchangeBuilder.anExchange(camelContext).build());
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_ACCESS_KEY")).thenReturn("foo");
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_SECRET_KEY")).thenReturn("bar");
+
+        producer.send("{{camel.route.delete-archive}}", ExchangeBuilder.anExchange(camelContext).build());
 
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
         Assertions.assertEquals(0, bucketContent.contents().size());

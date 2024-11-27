@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.main.java-routes-include-pattern=**/S3Api" }
+        properties = { "camel.main.java-routes-include-pattern=**/S3Api" } // In the test only start included routes
 )
 @EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
