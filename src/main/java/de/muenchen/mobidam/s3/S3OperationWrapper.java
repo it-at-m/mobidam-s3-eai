@@ -43,7 +43,7 @@ public class S3OperationWrapper implements Processor {
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                CommonError error = ErrorResponseBuilder.build(400, "Object name is empty");
+                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
                 exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
@@ -66,7 +66,7 @@ public class S3OperationWrapper implements Processor {
 
             objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                CommonError error = ErrorResponseBuilder.build(400, "Object name is empty");
+                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
                 exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
