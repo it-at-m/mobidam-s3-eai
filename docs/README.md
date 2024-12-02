@@ -94,15 +94,20 @@ Mit der Rest Ressource GET '.../filesInFolder?bucketName=bucket1&path=...&archiv
 
 ### Konfiguration
 
-Zur Konfiguration der Credentials der Buckets dient das Property ***mobidam.s3.bucket-credential-config***.
+Zur Konfiguration der Credentials der Buckets dient das Property ***de.muenchen.mobidam.common.s3.bucket-credential-configs***.
 Dieses ist als Map gestaltet und enthält die default Tenant-Credentials. Nach Bedarf können der Access-Key und Secret-Key für die einzelnen Buckets separat konfiguriert werden:
 ```
-tenant-default:
-  access-key-env-var: MOBIDAM_ACCESS_KEY
-  secret-key-env-var: MOBIDAM_SECRET_KEY
-int-mdasc-mdasdev:
-  access-key-env-var: MOBIDAM_BUCKET2_ACCESS_KEY
-  secret-key-env-var: MOBIDAM_BUCKET2_SECRET_KEY
+de.muenchen.mobidam:
+  common:
+    s3:
+      bucket-credential-configs:
+        tenant-default:
+          access-key-env-var: MOBIDAM_ACCESS_KEY
+          secret-key-env-var: MOBIDAM_SECRET_KEY
+        int-mdasc-mdasdev:
+          access-key-env-var: MOBIDAM_BUCKET2_ACCESS_KEY
+          secret-key-env-var: MOBIDAM_BUCKET2_SECRET_KEY
+
 ```
 Die Umgebungsvariablen müssen entsprechend in der Laufzeitumgebung bereitgestellt werden:
 ```
@@ -117,7 +122,7 @@ Alle im S3 archivierten Dateien werden nach einer Ablauffrist automatisch über 
 
 application.yaml:
 ```
-mobidam:
+de.muenchen.mobidam:
   archive:
     expiration-months: 1
 ```

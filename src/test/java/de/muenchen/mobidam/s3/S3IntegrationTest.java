@@ -27,7 +27,7 @@ import java.util.Collection;
 
 @Disabled
 @CamelSpringBootTest
-@SpringBootTest(classes = { Application.class }, properties = { "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," })
+@SpringBootTest(classes = { Application.class }, properties = { "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," })
 @ActiveProfiles("integration")
 class S3IntegrationTest {
 

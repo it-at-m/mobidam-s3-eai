@@ -7,6 +7,7 @@ package de.muenchen.mobidam.rest;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
+import de.muenchen.mobidam.eai.common.CommonConstants;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -23,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 @CamelSpringBootTest
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-        properties = { "camel.springboot.java-routes-include-pattern=**/S3Api" }
+        properties = { "camel.main.java-routes-include-pattern=**/S3Api" } // In the test only start included routes
 )
 @EnableAutoConfiguration
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -45,7 +46,7 @@ class S3ApiFilesInFolderTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertNull(exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
@@ -57,7 +58,7 @@ class S3ApiFilesInFolderTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
 
@@ -69,7 +70,7 @@ class S3ApiFilesInFolderTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertNull(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
@@ -82,7 +83,7 @@ class S3ApiFilesInFolderTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));
     }
@@ -95,7 +96,7 @@ class S3ApiFilesInFolderTest {
         commonRoute.assertIsSatisfied();
 
         var exchange = commonRoute.getExchanges().get(0);
-        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(Constants.PARAMETER_BUCKET_NAME));
+        Assertions.assertEquals("TEST", exchange.getMessage().getHeader(CommonConstants.HEADER_BUCKET_NAME));
         Assertions.assertTrue(exchange.getMessage().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class));
         Assertions.assertEquals("sub1/sub2", exchange.getMessage().getHeader(Constants.PARAMETER_PATH, String.class));
         Assertions.assertEquals("/filesInFolder", exchange.getMessage().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH));

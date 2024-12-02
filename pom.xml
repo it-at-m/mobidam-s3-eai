@@ -20,7 +20,7 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
 
         <!-- Frameworks -->
-        <camel.version>4.1.0</camel.version>
+        <camel.version>4.8.0</camel.version>
         <spring.boot.version>3.1.4</spring.boot.version>
 
         <!-- Other Maven Plugins -->
@@ -123,10 +123,7 @@
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-servlet-starter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jackson</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-quartz</artifactId>
@@ -186,6 +183,11 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.muenchen.oss.mobidam</groupId>
+            <artifactId>mobidam-eai-commons-starter</artifactId>
+            <version>0.0.2</version>
         </dependency>
 
         <!-- Database -->
@@ -260,12 +262,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
         </dependency>
 
         <!-- Logging -->

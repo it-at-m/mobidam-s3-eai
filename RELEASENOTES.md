@@ -1,8 +1,11 @@
 # Release-Notes
-
 ## Sprint 20 (13.11.2024 - 03.12.2024)
-### Entfernt
 - Vespa Bucket Credentials entfernt
+- Update auf mobidam-eai-commons-starter:0.0.2.
+- Update Apache Camel.
+
+## Sprint 19 (22.10.2024 - 12.11.2024)
+- Umstellung auf mobidam-eai-commons-starter.
 
 ## Sprint 15 (30.07.2024 - 20.08.2024)
 ### Entfernt

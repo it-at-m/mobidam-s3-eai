@@ -1,10 +1,10 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.exception.MobidamException;
+import de.muenchen.mobidam.eai.common.exception.CommonError;
+import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import de.muenchen.mobidam.rest.BucketContentInner;
-import de.muenchen.mobidam.rest.ErrorResponse;
 import de.muenchen.mobidam.rest.PresignedUrl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -70,8 +70,8 @@ public class RestResponseWrapper implements Processor {
         var links = exchange.getIn().getBody(Collection.class);
 
         if (links.isEmpty()) {
-            ErrorResponse res = ErrorResponseBuilder.build(500, "Empty S3 url file list");
-            exchange.getMessage().setBody(res);
+            CommonError error = ErrorResponseBuilder.build(500, "Empty S3 url file list");
+            exchange.getMessage().setBody(error);
             throw new MobidamException("Empty S3 url file list");
         } else {
             var file = new PresignedUrl();

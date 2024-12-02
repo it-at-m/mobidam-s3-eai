@@ -2,9 +2,10 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
-import de.muenchen.mobidam.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.exception.MobidamException;
-import de.muenchen.mobidam.rest.ErrorResponse;
+import de.muenchen.mobidam.eai.common.CommonConstants;
+import de.muenchen.mobidam.eai.common.exception.CommonError;
+import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
+import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import java.time.Duration;
 import java.time.LocalDate;
 import org.apache.camel.Exchange;
@@ -30,7 +31,7 @@ public class S3OperationWrapper implements Processor {
     public void process(Exchange exchange) throws Exception {
 
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
-        var bucketName = exchange.getIn().getHeader(Constants.PARAMETER_BUCKET_NAME, String.class);
+        var bucketName = exchange.getIn().getHeader(CommonConstants.HEADER_BUCKET_NAME, String.class);
 
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
@@ -42,8 +43,8 @@ public class S3OperationWrapper implements Processor {
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                ErrorResponse res = ErrorResponseBuilder.build(400, "Object name is empty");
-                exchange.getMessage().setBody(res);
+                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
+                exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
 
@@ -65,8 +66,8 @@ public class S3OperationWrapper implements Processor {
 
             objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
             if (objectName == null) {
-                ErrorResponse res = ErrorResponseBuilder.build(400, "Object name is empty");
-                exchange.getMessage().setBody(res);
+                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
+                exchange.getMessage().setBody(error);
                 throw new MobidamException("Object name is empty");
             }
 
