@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
@@ -25,8 +26,10 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.annotation.AfterTestExecution;
+import org.springframework.test.context.event.annotation.AfterTestMethod;
+import org.springframework.test.context.event.annotation.BeforeTestExecution;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -80,8 +87,8 @@ class S3ArchiveTest {
     @Value("${mobidam.archive.expiration-months:1}")
     private int expiration;
 
-    @BeforeAll
-    public static void setUp() throws URISyntaxException {
+    @BeforeEach
+    public void setUp() throws URISyntaxException {
 
         localS3 = LocalS3.builder()
                 .port(8080)
@@ -113,8 +120,9 @@ class S3ArchiveTest {
         s3InitClient.createBucket(CreateBucketRequest.builder().bucket(TEST_BUCKET).build());
     }
 
-    @AfterAll
-    public static void shutdown() {
+    @AfterEach
+    public void shutdown() {
+        archiveRepository.deleteAll();
         localS3.shutdown();
     }
 
