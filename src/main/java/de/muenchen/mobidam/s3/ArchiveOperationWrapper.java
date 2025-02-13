@@ -11,6 +11,13 @@ import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import de.muenchen.mobidam.rest.BucketContentInner;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -19,14 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.S3Object;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
 
 @Component
 @Slf4j
@@ -95,8 +94,8 @@ public class ArchiveOperationWrapper implements Processor {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedNow = now.format(formatter);
 
-        for(BucketContentInner file : files){
-            if(Objects.equals(file.getKey(), objectName)){
+        for (BucketContentInner file : files) {
+            if (Objects.equals(file.getKey(), objectName)) {
                 var splittedObjectName = objectName.split("\\.");
                 objectName = splittedObjectName[0] + "_" + formattedNow + "." + splittedObjectName[1];
                 break;
