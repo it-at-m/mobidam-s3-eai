@@ -1,13 +1,11 @@
 package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
-import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.eai.common.CommonConstants;
 import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import java.time.Duration;
-import java.time.LocalDate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -23,9 +21,6 @@ public class S3OperationWrapper implements Processor {
 
     @Value("${mobidam.download.expiration:30}")
     private int downloadExpiration;
-
-    @Value("${mobidam.archive.expiration-months:1}")
-    private int archiveExpiration;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -64,23 +59,9 @@ public class S3OperationWrapper implements Processor {
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
 
-            objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
-            if (objectName == null) {
-                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
-                exchange.getMessage().setBody(error);
-                throw new MobidamException("Object name is empty");
-            }
-
-            exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
-            exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
-            exchange.getIn().setHeader(AWS2S3Constants.DESTINATION_KEY, Constants.ARCHIVE_PATH + objectName);
-
-            var archiveEntity = new MobidamArchive();
-            archiveEntity.setBucket(bucketName);
-            archiveEntity.setPath(exchange.getIn().getHeader(AWS2S3Constants.DESTINATION_KEY, String.class));
-            archiveEntity.setCreation(LocalDate.now());
-            archiveEntity.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
-            exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveEntity);
+            exchange.getIn().setHeader(Constants.PARAMETER_ARCHIVED, true);
+            exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
+            exchange.getIn().setHeader(Constants.PARAMETER_ARCHIVED, constructPrefixPattern(exchange));
 
             break;
 

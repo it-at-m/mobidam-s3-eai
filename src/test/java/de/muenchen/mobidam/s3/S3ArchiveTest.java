@@ -17,6 +17,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -145,6 +147,51 @@ class S3ArchiveTest {
         Assertions.assertEquals(TEST_BUCKET, dbContent.get(0).getBucket());
         Assertions.assertEquals(LocalDate.now(), dbContent.get(0).getCreation());
         Assertions.assertEquals(LocalDate.now().plusMonths(expiration), dbContent.get(0).getExpiration());
+
+    }
+
+    @Test
+    public void test_RouteWithArchiveSameFileName() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, PATH + OBJECT_KEY)
+                .build();
+
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_ACCESS_KEY")).thenReturn("foo");
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_SECRET_KEY")).thenReturn("bar");
+
+        // First archiving
+        producer.send("{{camel.route.common}}", s3Request);
+
+        var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
+
+        Assertions.assertEquals(1, bucketContent.contents().size());
+        Assertions.assertEquals(archive + "/" + PATH + OBJECT_KEY, bucketContent.contents().get(0).key());
+
+        // Second archiving
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        producer.send("{{camel.route.common}}", s3Request);
+
+        bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
+
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedNow = now.format(formatter);
+
+        Assertions.assertEquals(2, bucketContent.contents().size());
+        Assertions.assertTrue(bucketContent.contents().get(1).key().contains(formattedNow));
+
+        var dbContent = archiveRepository.findAll();
+        Assertions.assertEquals(2, dbContent.size());
+        Assertions.assertTrue(dbContent.get(1).getPath().contains(formattedNow));
 
     }
 
