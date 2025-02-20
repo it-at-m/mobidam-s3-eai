@@ -11,35 +11,34 @@ import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import de.muenchen.mobidam.rest.BucketContentInner;
-import java.math.BigDecimal;
+import de.muenchen.mobidam.service.ArchiveService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Component
-@Slf4j
 public class ArchiveOperationWrapper implements Processor {
 
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
 
-    @Value("${mobidam.limit.search.items:20}")
-    private int maxS3ObjectItems;
+    private final ArchiveService archiveService;
+
+    public ArchiveOperationWrapper(ArchiveService archiveService) {
+        this.archiveService = archiveService;
+    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        var filesInArchive = filesInFile(exchange);
+        var filesInArchive = archiveService.filesInFile(exchange);
 
         var bucketName = exchange.getIn().getHeader(CommonConstants.HEADER_BUCKET_NAME, String.class);
 
@@ -65,28 +64,6 @@ public class ArchiveOperationWrapper implements Processor {
         archiveEntity.setExpiration(LocalDate.now().plusMonths(archiveExpiration));
         exchange.setProperty(Constants.ARCHIVE_ENTITY, archiveEntity);
 
-    }
-
-    private ArrayList<BucketContentInner> filesInFile(Exchange exchange) {
-
-        var objects = exchange.getIn().getBody(Collection.class);
-
-        if (objects.size() > maxS3ObjectItems) {
-            log.warn("More than {} objects in storage", maxS3ObjectItems);
-        }
-
-        var files = new ArrayList<BucketContentInner>();
-
-        objects.stream().limit(maxS3ObjectItems).forEach(object -> {
-            var s3Object = (S3Object) object;
-            BucketContentInner content = new BucketContentInner();
-            content.setKey(s3Object.key());
-            content.setLastmodified(s3Object.lastModified().toString());
-            content.setSize(BigDecimal.valueOf(s3Object.size()));
-            files.add(content);
-        });
-
-        return files;
     }
 
     private String processObjectName(ArrayList<BucketContentInner> files, String objectName) {
