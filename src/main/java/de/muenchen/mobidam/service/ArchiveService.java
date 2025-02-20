@@ -38,7 +38,7 @@ public class ArchiveService {
         archiveRepository.delete(entity);
     }
 
-    public ArrayList<BucketContentInner> filesInFile(Exchange exchange) {
+    public ArrayList<BucketContentInner> getObjectsFoundInContainer(Exchange exchange) {
 
         var objects = exchange.getIn().getBody(Collection.class);
 

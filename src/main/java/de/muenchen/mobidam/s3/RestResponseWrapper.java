@@ -29,7 +29,7 @@ public class RestResponseWrapper implements Processor {
         var contextPath = exchange.getIn().getHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, String.class);
         switch (contextPath) {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER:
-            var filesInFolder = archiveService.filesInFile(exchange);
+            var filesInFolder = archiveService.getObjectsFoundInContainer(exchange);
             exchange.getMessage().setBody(filesInFolder);
             break;
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:

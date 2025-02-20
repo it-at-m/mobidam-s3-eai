@@ -38,7 +38,7 @@ public class ArchiveOperationWrapper implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        var filesInArchive = archiveService.filesInFile(exchange);
+        var filesInArchive = archiveService.getObjectsFoundInContainer(exchange);
 
         var bucketName = exchange.getIn().getHeader(CommonConstants.HEADER_BUCKET_NAME, String.class);
 
