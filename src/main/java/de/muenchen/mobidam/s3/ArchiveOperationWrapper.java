@@ -71,16 +71,18 @@ public class ArchiveOperationWrapper implements Processor {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedNow = now.format(formatter);
+        String processedObjectName = objectName;
 
         for (BucketContentInner file : files) {
             if (Objects.equals(file.getKey(), objectName)) {
                 String baseName = FilenameUtils.getBaseName(objectName);
                 String extension = FilenameUtils.getExtension(objectName);
-                objectName = String.format("%s_%s.%s", baseName, formattedNow, extension);
+                String path = FilenameUtils.getFullPath(objectName);
+                processedObjectName = String.format("%s%s_%s.%s", path, baseName, formattedNow, extension);
                 break;
             }
         }
 
-        return objectName;
+        return processedObjectName;
     }
 }
