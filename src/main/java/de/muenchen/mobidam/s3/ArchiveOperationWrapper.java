@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -73,8 +74,9 @@ public class ArchiveOperationWrapper implements Processor {
 
         for (BucketContentInner file : files) {
             if (Objects.equals(file.getKey(), objectName)) {
-                var splittedObjectName = objectName.split("\\.");
-                objectName = splittedObjectName[0] + "_" + formattedNow + "." + splittedObjectName[1];
+                String baseName = FilenameUtils.getBaseName(objectName);
+                String extension = FilenameUtils.getExtension(objectName);
+                objectName = String.format("%s_%s.%s", baseName, formattedNow, extension);
                 break;
             }
         }
