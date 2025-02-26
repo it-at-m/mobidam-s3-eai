@@ -7,9 +7,6 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.eai.common.CommonConstants;
-import de.muenchen.mobidam.eai.common.exception.CommonError;
-import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
-import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import de.muenchen.mobidam.rest.BucketContentInner;
 import de.muenchen.mobidam.service.ArchiveService;
 import java.time.LocalDate;
@@ -18,16 +15,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ArchiveOperationWrapper implements Processor {
+public class ArchiveOperationWrapper extends OperationWrapper{
 
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
@@ -47,11 +42,7 @@ public class ArchiveOperationWrapper implements Processor {
         exchange.getIn().removeHeader(AWS2S3Constants.S3_OPERATION);
 
         var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
-        if (objectName == null) {
-            CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
-            exchange.getMessage().setBody(error);
-            throw new MobidamException("Object name is empty");
-        }
+        exchange = checkObjectName(exchange, objectName);
 
         var archiveObjectName = processObjectName(filesInArchive, Constants.ARCHIVE_PATH + objectName);
 

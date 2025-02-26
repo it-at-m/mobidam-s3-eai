@@ -2,12 +2,10 @@ package de.muenchen.mobidam.s3;
 
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.eai.common.CommonConstants;
-import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;
 import java.time.Duration;
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
 import org.apache.camel.component.aws2.s3.AWS2S3Operations;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +15,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @Component
-public class S3OperationWrapper implements Processor {
+public class S3OperationWrapper extends OperationWrapper {
 
     @Value("${mobidam.download.expiration:30}")
     private int downloadExpiration;
@@ -37,11 +35,7 @@ public class S3OperationWrapper implements Processor {
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL:
 
             var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
-            if (objectName == null) {
-                CommonError error = ErrorResponseBuilder.build(HttpStatus.BAD_REQUEST.value(), "Object name is empty");
-                exchange.getMessage().setBody(error);
-                throw new MobidamException("Object name is empty");
-            }
+            exchange = checkObjectName(exchange, objectName);
 
             var archive = exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class) != null
                     ? exchange.getIn().getHeader(Constants.PARAMETER_ARCHIVED, Boolean.class)
