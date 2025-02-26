@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class ArchiveOperationWrapper implements Processor {
 
     @Value("${mobidam.archive.expiration-months:1}")
@@ -71,18 +72,12 @@ public class ArchiveOperationWrapper implements Processor {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedNow = now.format(formatter);
-        String processedObjectName = objectName;
 
-        for (BucketContentInner file : files) {
-            if (Objects.equals(file.getKey(), objectName)) {
-                String baseName = FilenameUtils.getBaseName(objectName);
-                String extension = FilenameUtils.getExtension(objectName);
-                String path = FilenameUtils.getFullPath(objectName);
-                processedObjectName = String.format("%s%s_%s.%s", path, baseName, formattedNow, extension);
-                break;
-            }
+        var archiveName = files.stream().filter(name -> name.getKey().equals(objectName)).map(name -> String.format("%s%s_%s.%s",
+                FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow, FilenameUtils.getExtension(objectName))).toList();
+        if (archiveName.size() > 1) {
+            log.info("Error/Warn ...");
         }
-
-        return processedObjectName;
+        return !archiveName.isEmpty() ? archiveName.get(0) : objectName;
     }
 }
