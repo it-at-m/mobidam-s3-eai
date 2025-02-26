@@ -1,6 +1,5 @@
 package de.muenchen.mobidam.s3;
 
-import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.eai.common.exception.CommonError;
 import de.muenchen.mobidam.eai.common.exception.ErrorResponseBuilder;
 import de.muenchen.mobidam.eai.common.exception.MobidamException;

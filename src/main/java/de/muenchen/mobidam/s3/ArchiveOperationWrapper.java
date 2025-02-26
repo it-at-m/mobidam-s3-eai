@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ArchiveOperationWrapper extends OperationWrapper{
+public class ArchiveOperationWrapper extends OperationWrapper {
 
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
