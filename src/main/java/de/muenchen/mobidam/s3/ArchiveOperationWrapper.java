@@ -64,11 +64,11 @@ public class ArchiveOperationWrapper extends OperationWrapper {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String formattedNow = now.format(formatter);
 
-        var archiveName = files.stream().filter(name -> name.getKey().equals(objectName)).map(name -> String.format("%s%s_%s.%s",
+        var archivedFilesWithGivenName = files.stream().filter(name -> name.getKey().equals(objectName)).map(name -> String.format("%s%s_%s.%s",
                 FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow, FilenameUtils.getExtension(objectName))).toList();
-        if (archiveName.size() > 1) {
-            log.info("Error/Warn ...");
+        if (archivedFilesWithGivenName.size() > 1) {
+            log.warn("Multiple files ({}) with identical name in the archive.", archivedFilesWithGivenName.size());
         }
-        return !archiveName.isEmpty() ? archiveName.get(0) : objectName;
+        return !archivedFilesWithGivenName.isEmpty() ? archivedFilesWithGivenName.get(0) : objectName;
     }
 }
