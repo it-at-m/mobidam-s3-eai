@@ -1,4 +1,7 @@
 # Release-Notes
+## Sprint 24 (04.02.2025 - 25.02.2025)
+- Archivieren mit Zeitstempel bei gleichnamigen Dateien
+
 ## Sprint 20 (13.11.2024 - 03.12.2024)
 - Vespa Bucket Credentials entfernt
 - Update auf mobidam-eai-commons-starter:0.0.2.
