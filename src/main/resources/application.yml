@@ -12,6 +12,8 @@ camel:
   route:
     common: direct:commonOperations
     delete-archive: quartz://mobidam/archiveCleanUp?cron=0+30+2+?+*+*
+  metrics:
+    enable-message-history: false
 
 de.muenchen.mobidam:
   common:
