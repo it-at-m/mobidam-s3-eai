@@ -86,7 +86,6 @@ management:
     camel:
       enabled: false
 
-
 info:
   application:
     name: @project.artifactId@
