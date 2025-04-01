@@ -1,4 +1,8 @@
 # Release-Notes
+## Sprint 26 (18.03.2025 - 08.04.2025)
+## Hinzugefügt
+- Metriken für Grafana Dashboard eingerichtet.
+
 ## Sprint 24 (04.02.2025 - 25.02.2025)
 - Archivieren mit Zeitstempel bei gleichnamigen Dateien
 

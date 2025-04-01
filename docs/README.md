@@ -155,35 +155,7 @@ spring:
 ```
 
 ## Grafana
-Die Mobilithek Grafana Dashboards für die Umgebungen _mobidam-dev_ und _mobidam_ sind  über den 'CAP Grafana Overview' der jeweiligen Umgebungen erreichbar. Die URLs der 'Overviews' finden sich im LHM-CAP-Wiki.
-Bislang sind nur für Umgebungen _mobidam-dev_ und _mobidam_ Grafana-Operatoren eingerichtet und Dashboards verfügbar:
-
-- _<mobidam-grafana-url>/Dashboards/<kubernetes-namespace>/mobidam-mobilithek-eai-<environment>-cap_
-
-Von der mobidam-mobilitheks-eai werden verschiedene auf Probleme hinweisende Metriken für die Dashboards zur Auswertung zur Verfügung gestellt:
-- Kennwerte die Verarbeitung von Camel Exchanges betreffen.
-- Kennwerte die auf Probleme bei einzelnen Schnittstellen hinweisen.
-- Kennwerte die die Verarbeitung von Downloads erfassen.
-
-Jede Dashboard Visualisierung stellt Erklärungen zu ihren Inhalten zur Verfügung.
-
-Das Dashboard ist gemäß der Anleitung im LHM-CAP-Wiki als Kubernetes Dashboard Manifest gesichert. **Das hat zwei Auswirkungen
-für die Arbeit mit dem Grafana Dashboard zur Folge**:
-
-- Änderungen die man im Grafana Dashboard vornimmt werden durch das Kubernetes Manifeste automatisch wieder überschrieben.
-  Um das zu vermeiden über den Dashboard Edit Modus erst eine Kopie des Dashboard erstellen und die Änderungen darin vornehmen.
-- Alle Änderungen die in der Kopie des Grafana Dashboard gemacht werden, müssen im Kubernetes Manifest widergespiegelt werden.
-  Dazu das _Grafana -> Settings -> JSON Model_ im Kubernetes Dashboard Manifest per Copy-Paste aktualisieren.
-  Anschließend werden durch Kubernetes alle Manifest Änderungen wieder mit dem Grafana Dashboard aktualisiert und alle Umgebungen sind wieder up-to-date.
-
-Um Dashboard Aktualisierungen von K auf P zu bringen, die _JSON Model_ Änderungen in den Kubernetes Dashboards Manifeste der Namespaces synchronisieren.
-Die Grafana Instanzen auf K und P sind eigenständig. Daher kann die Grafana Dashboard-UID beibehalten werden.
-Bei Problemen mit der Dashboard-UID diese einfach neu Vergeben.
-Ist bei der Aktualisierung des Grafana Dashboards aus dem Kubenetes Manifest heraus keine Dashboard-UID vorhanden, wird diese automatisch neu generiert.
-Die UID kann im Zweifel im Kubernetes Dashboard Manifest also gelöscht werden.
-
-Alle von der mobidam-mobilithek-eai zur Verfügung gestellten Metriken können im Pod-Terminal mit _curl localhost:8080/actuator/prometheus_ angezeigt werden.
-Das ist zum Beispiel hilfreich um eine Überblick über alle Metrik Identifier mit ihren Werten zum Abfragezeitunkt zu bekommen.
+Die EAI stellt Metriken für die Auswertung in einem Grafana Dashboard zur Verfügung.
+Alle zur Verfügung gestellten Metriken können im Pod-Terminal mit _curl localhost:8080/actuator/prometheus_ angezeigt werden.
 Einige Schnittstelle spezifische Metriken werden dynamisch erzeugt und sind erst sichtbar wenn die Schnittstelle aktiviert und erfolgreich beendet wurde.
-Wenn im Dashboard dazu trotzdem Werte angezeigt werden die in der der curl-Abfrage nicht sichtbar sind, liegt das daran das die Dashboard Übersichten Pod übergreifend ihre Werte ermitteln können.
-So sind auch Abweichungen bei den Werten zwischen Pod-Abfrage und Grafana Dashboard zu erklären
+Weitere Informationen zum Grafana Dashboard finden sich im Betriebshandbuch und der Systemspezifikation.
