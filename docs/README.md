@@ -153,3 +153,6 @@ spring:
     driver-class-name: ...
 
 ```
+
+### Grafana
+Siehe die Beschreibung https://github.com/it-at-m/mobidam-mobilithek-eai/blob/sprint/docs/README.md#grafana.
