@@ -12,6 +12,8 @@ camel:
   route:
     common: direct:commonOperations
     delete-archive: quartz://mobidam/archiveCleanUp?cron=0+30+2+?+*+*
+  metrics:
+    enable-message-history: false
 
 de.muenchen.mobidam:
   common:
@@ -68,11 +70,15 @@ management:
     enabled-by-default: false
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
   endpoint:
     info:
       enabled: true
     health:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
       enabled: true
   info:
     env:
