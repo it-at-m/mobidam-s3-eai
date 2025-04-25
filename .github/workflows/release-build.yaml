@@ -95,6 +95,8 @@ jobs:
 
       - name: Set Maven Project Version
         id: set-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           current_version=$(mvn help:evaluate -f pom.xml -Dexpression=project.version -q -DforceStdout)
           echo "Current version: $current_version"
@@ -103,6 +105,8 @@ jobs:
           mvn -B versions:set -DnewVersion=$new_version -f pom.xml
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
+          git checkout -b release-$new_version
           git add pom.xml
-          git commit -m "Bump version to $new_version"
-          git push
+          git commit -m "Bump sprint version to $new_version"
+          git push --set-upstream origin release-$new_version
+          gh pr create --title "Bump eai version to $new_version" --base sprint --head release-$new_version --body "Bump eai version to $new_version after Release build"

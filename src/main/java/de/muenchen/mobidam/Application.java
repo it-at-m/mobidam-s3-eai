@@ -4,6 +4,7 @@
  */
 package de.muenchen.mobidam;
 
+import org.apache.camel.observation.starter.CamelObservation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Spring Boot Anwendung, die alle Camel Routen startet.
  */
 @SpringBootApplication
+@CamelObservation
 public class Application {
 
     /**

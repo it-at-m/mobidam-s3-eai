@@ -9,7 +9,8 @@ import com.robothy.s3.rest.bootstrap.LocalS3Mode;
 import de.muenchen.mobidam.Application;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.TestConstants;
-import de.muenchen.mobidam.rest.ErrorResponse;
+import de.muenchen.mobidam.eai.common.CommonConstants;
+import de.muenchen.mobidam.eai.common.exception.CommonError;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,7 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -42,14 +42,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 @SpringBootTest(
         classes = { Application.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
-                "camel.springboot.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder,"
-        }
-)
-@TestPropertySource(
-        properties = {
-                "FOO_ACCESS_KEY=foo",
-                "FOO_SECRET_KEY=bar"
-        }
+                "camel.main.java-routes-include-pattern=**/S3RouteBuilder,**/ExceptionRouteBuilder," } // In the test only start included routes
 )
 @EnableAutoConfiguration
 @DirtiesContext
@@ -114,7 +107,7 @@ class S3BucketTest {
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(CommonError.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
@@ -124,11 +117,11 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, "foo")
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, "foo")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(CommonError.class);
         Assertions.assertEquals("Bucket not configured: foo", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), error.getStatus());
 
@@ -139,11 +132,11 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, null)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, null)
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(CommonError.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
@@ -153,11 +146,11 @@ class S3BucketTest {
 
         var s3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_FILES_IN_FOLDER)
-                .withHeader(Constants.PARAMETER_BUCKET_NAME, "")
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, "")
                 .build();
         var response = producer.send("{{camel.route.common}}", s3Request);
 
-        var error = response.getIn().getBody(ErrorResponse.class);
+        var error = response.getIn().getBody(CommonError.class);
         Assertions.assertEquals("Bucket name is missing", error.getError());
         Assertions.assertEquals(BigDecimal.valueOf(HttpStatus.BAD_REQUEST.value()), error.getStatus());
     }
