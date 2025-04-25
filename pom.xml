@@ -6,7 +6,7 @@
 
     <groupId>de.muenchen.mobidam</groupId>
     <artifactId>mobidam-s3-eai</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>mobidam-s3-eai</name>
     <description>Mobidam S3 EAI.</description>
 
