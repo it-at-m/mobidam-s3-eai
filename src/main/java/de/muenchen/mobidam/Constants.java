@@ -14,6 +14,7 @@ public class Constants {
     public static final String CAMEL_SERVLET_CONTEXT_PATH_PRESIGNED_URL = "/presignedUrl";
     public static final String CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE = "/archive";
     public static final String PARAMETER_ARCHIVED = "archived";
+    public static final String PARAMETER_PREFIX = "prefix";
     public static final String PARAMETER_OBJECT_NAME = "objectName";
     public static final String PARAMETER_PATH = "path";
     public static final String ARCHIVE_PATH = "archive/";
