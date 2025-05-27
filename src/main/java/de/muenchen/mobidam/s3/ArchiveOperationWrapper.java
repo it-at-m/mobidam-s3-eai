@@ -7,12 +7,10 @@ package de.muenchen.mobidam.s3;
 import de.muenchen.mobidam.Constants;
 import de.muenchen.mobidam.domain.MobidamArchive;
 import de.muenchen.mobidam.eai.common.CommonConstants;
-import de.muenchen.mobidam.rest.BucketContentInner;
-import de.muenchen.mobidam.service.ArchiveService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.aws2.s3.AWS2S3Constants;
@@ -27,16 +25,11 @@ public class ArchiveOperationWrapper extends OperationWrapper {
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
 
-    private final ArchiveService archiveService;
-
-    public ArchiveOperationWrapper(ArchiveService archiveService) {
-        this.archiveService = archiveService;
-    }
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        var filesInArchive = archiveService.getObjectsFoundInContainer(exchange);
-
+        var file = exchange.getIn().getBody(Collection.class);
         var bucketName = exchange.getIn().getHeader(CommonConstants.HEADER_BUCKET_NAME, String.class);
 
         exchange.getIn().removeHeader(AWS2S3Constants.S3_OPERATION);
@@ -44,7 +37,11 @@ public class ArchiveOperationWrapper extends OperationWrapper {
         var objectName = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
         exchange = checkObjectName(exchange, objectName);
 
-        var archiveObjectName = processObjectName(filesInArchive, Constants.ARCHIVE_PATH + objectName);
+        var archiveObjectName = Constants.ARCHIVE_PATH + objectName;
+
+        if (!file.isEmpty()) {
+            archiveObjectName = processObjectName(archiveObjectName);
+        }
 
         exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
         exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
@@ -59,16 +56,12 @@ public class ArchiveOperationWrapper extends OperationWrapper {
 
     }
 
-    private String processObjectName(ArrayList<BucketContentInner> files, String objectName) {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        String formattedNow = now.format(formatter);
+    private String processObjectName(String objectName) {
+        log.info("Multiple files with identical name ({}) in the archive.", objectName);
 
-        var archivedFilesWithGivenName = files.stream().filter(name -> name.getKey().equals(objectName)).map(name -> String.format("%s%s_%s.%s",
-                FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow, FilenameUtils.getExtension(objectName))).toList();
-        if (archivedFilesWithGivenName.size() > 1) {
-            log.warn("Multiple files ({}) with identical name in the archive.", archivedFilesWithGivenName.size());
-        }
-        return !archivedFilesWithGivenName.isEmpty() ? archivedFilesWithGivenName.get(0) : objectName;
+        String formattedNow = LocalDateTime.now().format(formatter);
+
+        return String.format("%s%s_%s.%s", FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow,
+                FilenameUtils.getExtension(objectName));
     }
 }
