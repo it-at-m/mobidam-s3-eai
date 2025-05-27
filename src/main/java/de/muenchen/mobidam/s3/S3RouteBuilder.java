@@ -91,9 +91,9 @@ public class S3RouteBuilder extends RouteBuilder {
                  */
                 .when().simple(String.format("${header.%s} == '%s'", Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE))
                 .toD(String.format(
-                        "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=${header.%4$s}&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&${header.%5$s}",
-                        CommonConstants.HEADER_BUCKET_NAME, CommonConstants.HEADER_ACCESS_KEY, CommonConstants.HEADER_SECRET_KEY, AWS2S3Constants.S3_OPERATION,
-                        Constants.PARAMETER_ARCHIVED))
+                        "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=listObjects&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}&prefix=%4$s${header.%5$s}",
+                        CommonConstants.HEADER_BUCKET_NAME, CommonConstants.HEADER_ACCESS_KEY, CommonConstants.HEADER_SECRET_KEY, Constants.ARCHIVE_PATH,
+                        Constants.PARAMETER_OBJECT_NAME))
                 .process("archiveOperationWrapper")
                 .toD(String.format(
                         "aws2-s3://${header.%1$s}?accessKey=RAW(${header.%2$s})&secretKey=RAW(${header.%3$s})&region={{camel.component.aws2-s3.region}}&operation=%4$s&overrideEndpoint=true&uriEndpointOverride={{camel.component.aws2-s3.override-endpoint}}",
