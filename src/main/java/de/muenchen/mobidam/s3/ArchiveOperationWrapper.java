@@ -25,7 +25,7 @@ public class ArchiveOperationWrapper extends OperationWrapper {
     @Value("${mobidam.archive.expiration-months:1}")
     private int archiveExpiration;
 
-    private final String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -59,7 +59,9 @@ public class ArchiveOperationWrapper extends OperationWrapper {
     private String processObjectName(String objectName) {
         log.info("Multiple files with identical name ({}) in the archive.", objectName);
 
-        return String.format("%s%s_%s.%s", FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedDateTime,
+        String formattedNow = LocalDateTime.now().format(formatter);
+
+        return String.format("%s%s_%s.%s", FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow,
                 FilenameUtils.getExtension(objectName));
     }
 }
