@@ -53,10 +53,7 @@ public class S3OperationWrapper extends OperationWrapper {
 
         case Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE:
             var file = exchange.getIn().getHeader(Constants.PARAMETER_OBJECT_NAME, String.class);
-            exchange = checkObjectName(exchange, file);
-
-            exchange.getIn().setHeader(AWS2S3Constants.S3_OPERATION, AWS2S3Operations.listObjects);
-            exchange.getIn().setHeader(Constants.PARAMETER_PREFIX, Constants.S3_PREFIX + Constants.ARCHIVE_PATH + file);
+            checkObjectName(exchange, file);
 
             break;
 
