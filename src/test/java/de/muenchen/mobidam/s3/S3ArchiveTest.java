@@ -79,6 +79,8 @@ class S3ArchiveTest {
 
     private static final String OBJECT_KEY = "File_1.csv";
 
+    private static final String FILE_NAME = "File_1";
+
     private static final String PATH = "sub1/sub2/";
 
     @Value("${mobidam.archive.name:archive}")
@@ -147,11 +149,11 @@ class S3ArchiveTest {
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
         Assertions.assertEquals(1, bucketContent.contents().size());
-        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + OBJECT_KEY));
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + FILE_NAME));
 
         var dbContent = archiveRepository.findAll();
         Assertions.assertEquals(1, dbContent.size());
-        Assertions.assertEquals(archive + "/" + PATH + OBJECT_KEY, dbContent.get(0).getPath());
+        Assertions.assertTrue(dbContent.get(0).getPath().contains(archive + "/" + PATH + FILE_NAME));
         Assertions.assertEquals(TEST_BUCKET, dbContent.get(0).getBucket());
         Assertions.assertEquals(LocalDate.now(), dbContent.get(0).getCreation());
         Assertions.assertEquals(LocalDate.now().plusMonths(expiration), dbContent.get(0).getExpiration());
@@ -165,37 +167,43 @@ class S3ArchiveTest {
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
-        var s3Request = ExchangeBuilder.anExchange(camelContext)
+        var firstS3Request = ExchangeBuilder.anExchange(camelContext)
                 .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
                 .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
                 .withHeader(Constants.PARAMETER_OBJECT_NAME, PATH + OBJECT_KEY)
+                .build();
+
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedNow = now.format(formatter);
+
+        var secondS3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, PATH + FILE_NAME + formattedNow + ".csv")
                 .build();
 
         Mockito.when(environmentReader.getEnvironmentVariable("FOO_ACCESS_KEY")).thenReturn("foo");
         Mockito.when(environmentReader.getEnvironmentVariable("FOO_SECRET_KEY")).thenReturn("bar");
 
         // First archiving
-        producer.send("{{camel.route.common}}", s3Request);
+        producer.send("{{camel.route.common}}", firstS3Request);
 
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
         Assertions.assertEquals(1, bucketContent.contents().size());
-        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + OBJECT_KEY));
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + FILE_NAME));
 
         // Second archiving
-        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + FILE_NAME + formattedNow + ".csv").build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
 
-        producer.send("{{camel.route.common}}", s3Request);
+        producer.send("{{camel.route.common}}", secondS3Request);
 
         bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
-        LocalDate now = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formattedNow = now.format(formatter);
-
         Assertions.assertEquals(2, bucketContent.contents().size());
-        Assertions.assertTrue(bucketContent.contents().get(1).key().contains(formattedNow));
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(formattedNow));
 
         var dbContent = archiveRepository.findAll();
         Assertions.assertEquals(2, dbContent.size());
