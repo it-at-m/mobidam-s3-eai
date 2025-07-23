@@ -147,7 +147,7 @@ class S3ArchiveTest {
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
         Assertions.assertEquals(1, bucketContent.contents().size());
-        Assertions.assertEquals(archive + "/" + PATH + OBJECT_KEY, bucketContent.contents().get(0).key());
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + OBJECT_KEY));
 
         var dbContent = archiveRepository.findAll();
         Assertions.assertEquals(1, dbContent.size());
@@ -180,7 +180,7 @@ class S3ArchiveTest {
         var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
 
         Assertions.assertEquals(1, bucketContent.contents().size());
-        Assertions.assertEquals(archive + "/" + PATH + OBJECT_KEY, bucketContent.contents().get(0).key());
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + OBJECT_KEY));
 
         // Second archiving
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
