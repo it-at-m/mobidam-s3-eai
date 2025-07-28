@@ -40,8 +40,12 @@ public class ArchiveOperationWrapper extends OperationWrapper {
         var archiveObjectName = Constants.ARCHIVE_PATH + objectName;
 
         if (!file.isEmpty()) {
-            archiveObjectName = processObjectName(archiveObjectName);
+            log.info("No files with the name ({}) in the archive.", archiveObjectName);
+        } else {
+            log.info("Found file with name ({}) in the archive.", archiveObjectName);
         }
+
+        archiveObjectName = processArchivedObjectName(archiveObjectName);
 
         exchange.getIn().setHeader(AWS2S3Constants.BUCKET_DESTINATION_NAME, bucketName);
         exchange.getIn().setHeader(AWS2S3Constants.KEY, objectName);
@@ -56,12 +60,10 @@ public class ArchiveOperationWrapper extends OperationWrapper {
 
     }
 
-    private String processObjectName(String objectName) {
-        log.info("Multiple files with identical name ({}) in the archive.", objectName);
-
+    private String processArchivedObjectName(String archivedObjectName) {
         String formattedNow = LocalDateTime.now().format(formatter);
 
-        return String.format("%s%s_%s.%s", FilenameUtils.getFullPath(objectName), FilenameUtils.getBaseName(objectName), formattedNow,
-                FilenameUtils.getExtension(objectName));
+        return String.format("%s%s_%s.%s", FilenameUtils.getFullPath(archivedObjectName), FilenameUtils.getBaseName(archivedObjectName), formattedNow,
+                FilenameUtils.getExtension(archivedObjectName));
     }
 }
