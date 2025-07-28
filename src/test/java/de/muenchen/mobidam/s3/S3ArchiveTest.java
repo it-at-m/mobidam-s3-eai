@@ -245,7 +245,6 @@ class S3ArchiveTest {
         String formattedTest = testLocalDate.format(formatter);
         Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS).when(LocalDateTime::now).thenReturn(testLocalDate);
 
-
         // Second archiving
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
                 Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
@@ -262,6 +261,5 @@ class S3ArchiveTest {
         Assertions.assertTrue(dbContent.get(1).getPath().contains(formattedNow) || dbContent.get(1).getPath().contains(formattedTest));
 
     }
-
 
 }
