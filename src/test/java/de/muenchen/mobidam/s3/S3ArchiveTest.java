@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -161,7 +163,7 @@ class S3ArchiveTest {
     }
 
     @Test
-    public void test_RouteWithArchiveSameFileName() {
+    public void test_RouteWithArchiveMultipleFileNames() {
 
         // Set S3 test-bucket content
         s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
@@ -210,5 +212,56 @@ class S3ArchiveTest {
         Assertions.assertTrue(dbContent.get(1).getPath().contains(formattedNow));
 
     }
+
+    @Test
+    public void test_RouteWithArchiveSameFileName() {
+
+        // Set S3 test-bucket content
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        var s3Request = ExchangeBuilder.anExchange(camelContext)
+                .withHeader(Constants.CAMEL_SERVLET_CONTEXT_PATH, Constants.CAMEL_SERVLET_CONTEXT_PATH_ARCHIVE)
+                .withHeader(CommonConstants.HEADER_BUCKET_NAME, TEST_BUCKET)
+                .withHeader(Constants.PARAMETER_OBJECT_NAME, PATH + OBJECT_KEY)
+                .build();
+
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedNow = now.format(formatter);
+
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_ACCESS_KEY")).thenReturn("foo");
+        Mockito.when(environmentReader.getEnvironmentVariable("FOO_SECRET_KEY")).thenReturn("bar");
+
+        // First archiving
+        producer.send("{{camel.route.common}}", s3Request);
+
+        var bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
+
+        Assertions.assertEquals(1, bucketContent.contents().size());
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(archive + "/" + PATH + FILE_NAME));
+
+        LocalDateTime testLocalDate = LocalDateTime.of(2010, 2, 13, 0, 0);
+        String formattedTest = testLocalDate.format(formatter);
+        Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS).when(LocalDateTime::now).thenReturn(testLocalDate);
+
+
+        // Second archiving
+        s3InitClient.putObject(PutObjectRequest.builder().bucket(TEST_BUCKET).key(PATH + OBJECT_KEY).build(),
+                Path.of(new File("src/test/resources/s3/Test.csv").toURI()));
+
+        producer.send("{{camel.route.common}}", s3Request);
+
+        bucketContent = s3InitClient.listObjects(ListObjectsRequest.builder().bucket(TEST_BUCKET).build());
+
+        Assertions.assertEquals(2, bucketContent.contents().size());
+        Assertions.assertTrue(bucketContent.contents().get(0).key().contains(formattedNow) || bucketContent.contents().get(0).key().contains(formattedTest));
+
+        var dbContent = archiveRepository.findAll();
+        Assertions.assertEquals(2, dbContent.size());
+        Assertions.assertTrue(dbContent.get(1).getPath().contains(formattedNow) || dbContent.get(1).getPath().contains(formattedTest));
+
+    }
+
 
 }
