@@ -1,4 +1,8 @@
 # Release-Notes
+## Sprint 33 (12.08.2025 - 02.09.2025)
+## Angepasst
+- Löschintervall von Archiv erhöht
+
 ## Sprint 26 (18.03.2025 - 08.04.2025)
 ## Hinzugefügt
 - Metriken für Grafana Dashboard eingerichtet.
