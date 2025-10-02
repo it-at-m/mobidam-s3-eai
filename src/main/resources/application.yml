@@ -23,7 +23,7 @@ de.muenchen.mobidam:
           access-key-env-var: MOBIDAM_ACCESS_KEY
           secret-key-env-var: MOBIDAM_SECRET_KEY
   archive:
-    expiration-months: 1
+    expiration-months: 3
   limit:
     search:
       items: 2000
