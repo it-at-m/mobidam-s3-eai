@@ -20,7 +20,7 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
 
         <!-- Frameworks -->
-        <camel.version>4.8.0</camel.version>
+        <camel.version>4.14.1</camel.version>
         <spring.boot.version>3.3.3</spring.boot.version>
 
         <!-- Other Maven Plugins -->
