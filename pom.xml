@@ -21,7 +21,7 @@
 
         <!-- Frameworks -->
         <camel.version>4.8.0</camel.version>
-        <spring.boot.version>3.3.3</spring.boot.version>
+        <spring.boot.version>3.5.6</spring.boot.version>
 
         <!-- Other Maven Plugins -->
         <maven-scm-plugin.version>1.13.0</maven-scm-plugin.version>
