@@ -41,7 +41,7 @@
         <itm-java-codeformat.version>1.0.9</itm-java-codeformat.version>
 
         <!-- Other -->
-        <org.projectlombok.lombok.version>1.18.26</org.projectlombok.lombok.version>
+        <org.projectlombok.lombok.version>1.18.42</org.projectlombok.lombok.version>
         <openapi-generator-maven-plugin.version>6.6.0</openapi-generator-maven-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
